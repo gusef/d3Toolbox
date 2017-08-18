@@ -1,0 +1,10 @@
+Package: d3Toolbox
+Title: Toolbox of interactive visualizations for R/Shiny powered by javascript and d3.js
+Version: 0.0.0.9000
+Authors@R: person("Daniel", "Gusenleitner", email = "gusef24@gmail.com", role = c("aut", "cre"))
+Description: This package contains a htmlwidget package that allows the inclusion of an interactive javascript/D3 boxplot into a Shiny app.
+Depends: R (>= 3.4.0), gplots
+Imports: gplots
+License: MIT
+Encoding: UTF-8
+LazyData: true
