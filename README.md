@@ -10,31 +10,31 @@ install_github("gusef/d3Toolbox")
 
 ## Simple Barplot
 ```{r simple_scatter, warning=FALSE, eval=FALSE}
-require(D3Scatter)
-        data("iris")
-        data <- data.frame(x=iris$Sepal.Length,
-                           y=iris$Sepal.Width,
-                           z=iris$Petal.Length,
-                           Species=iris$Species)
-      
-        legend <- data.frame(col=c('steelblue','orange','black'),
-                             name=levels(iris$Species))
-        
-        D3Scatter(data,
-                  col=c('steelblue','orange','black')[as.numeric(iris$Species)],
-                  dotsize = 6,
-                  xlab='Sepal Length',
-                  ylab='Sepal Width',
-                  title='Iris dataset',
-                  subtitle='subtitle',
-                  tooltip = c('Species','z'),
-                  legend = legend,
-                  callback_handler='ScatterSelection')
+require(d3Toolbox)
+data("iris")
+data <- data.frame(x=iris$Sepal.Length,
+                   y=iris$Sepal.Width,
+                   z=iris$Petal.Length,
+                   Species=iris$Species)
+ 
+legend <- data.frame(col=c('steelblue','orange','black'),
+                     name=levels(iris$Species))
+    
+D3Scatter(data,
+          col=c('steelblue','orange','black')[as.numeric(iris$Species)],
+          dotsize = 6,
+          xlab='Sepal Length',
+          ylab='Sepal Width',
+          title='Iris dataset',
+          subtitle='subtitle',
+          tooltip = c('Species','z'),
+          legend = legend,
+          callback_handler='ScatterSelection')
 ```
 
 ## Simple Boxplot
 ```{r simple_box, warning=FALSE, eval=FALSE}
-require(D3Boxplot)
+require(d3Toolbox)
 data <- lapply(levels(iris$Species),
                       function(x,y)y[y$Species==x,'Sepal.Length'],
                       iris)
@@ -52,7 +52,7 @@ D3Boxplot(data,
 
 ## Simple Barplot
 ```{r simple_barplot, warning=FALSE, eval=FALSE}
-require(D3Barplot)
+require(d3Toolbox)
 data <- 1:15
 names(data) <- c(LETTERS[1:15])
 
