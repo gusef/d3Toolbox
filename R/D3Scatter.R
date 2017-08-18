@@ -1,4 +1,4 @@
-#' Scatterplot based on D3
+#' Scatterplot based on d3
 #'
 #'
 #'
@@ -69,19 +69,19 @@ d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
         callback_handler = callback_handler
     )
 
-  # create widget
-  htmlwidgets::createWidget(
-    name = 'd3Scatter',
-    x,
-    width = width,
-    height = height,
-    package = 'd3Toolbox',
-    elementId = elementId,
-    sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
-  )
+    # create widget
+    htmlwidgets::createWidget(
+        name = 'd3Scatter',
+        x,
+        width = width,
+        height = height,
+        package = 'd3Toolbox',
+        elementId = elementId,
+        sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
+    )
 }
 
-#' Shiny bindings for D3Scatter
+#' Shiny bindings for d3Scatter
 #'
 #' Output and render functions for using D3Scatter within Shiny
 #' applications and interactive Rmd documents.
@@ -99,12 +99,12 @@ d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
 #'
 #' @export
 d3ScatterOutput <- function(outputId, width = '100%', height = '400px'){
-  htmlwidgets::shinyWidgetOutput(outputId, 'd3Scatter', width, height, package = 'd3Toolbox')
+    htmlwidgets::shinyWidgetOutput(outputId, 'd3Scatter', width, height, package = 'd3Toolbox')
 }
 
 #' @rdname d3Scatter-shiny
 #' @export
 renderd3Scatter <- function(expr, env = parent.frame(), quoted = FALSE) {
-  if (!quoted) { expr <- substitute(expr) } # force quoted
-  htmlwidgets::shinyRenderWidget(expr, d3ScatterOutput, env, quoted = TRUE)
+    if (!quoted) { expr <- substitute(expr) } # force quoted
+    htmlwidgets::shinyRenderWidget(expr, d3ScatterOutput, env, quoted = TRUE)
 }

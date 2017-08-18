@@ -18,10 +18,6 @@ HTMLWidgets.widget({
         renderValue: function(x) {
             el.innerHTML = '';
 
-            console.log('render wid ' + wid);
-            console.log('render width ' + width);
-
-
             //figuring out width and height in a way that redrawing works
             wid = wid === null ? width : wid;
             hei = hei === null ? height : hei;
@@ -45,7 +41,6 @@ HTMLWidgets.widget({
         },
 
         resize: function(width, height) {
-            console.log('redraw wid ' + wid);
 
             wid = width;
             hei = height;
