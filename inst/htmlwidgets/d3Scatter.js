@@ -1,6 +1,6 @@
 HTMLWidgets.widget({
 
-    name: 'D3Scatter',
+    name: 'd3Scatter',
 
     type: 'output',
 
@@ -11,21 +11,21 @@ HTMLWidgets.widget({
         var param = null;
         var wid = null;
         var hei = null;
-        
+
 
     return {
 
         renderValue: function(x) {
             el.innerHTML = '';
-            
+
             console.log('render wid ' + wid);
             console.log('render width ' + width);
-            
+
 
             //figuring out width and height in a way that redrawing works
             wid = wid === null ? width : wid;
             hei = hei === null ? height : hei;
-            
+
             svg  = d3.select(el).append("svg")
                      .attr("width", wid)
                      .attr("height", hei);
@@ -57,7 +57,7 @@ HTMLWidgets.widget({
 	        d3.select(el).selectAll("d3-tip").remove();
 	        this.redraw(this.data, this.param, width, height);
         },
-      
+
         redraw: function(data, param, width, height) {
             d3data = HTMLWidgets.dataframeToD3(data);
 
@@ -87,19 +87,19 @@ HTMLWidgets.widget({
             } else {
                 x.domain(param.xrange);
             }
-                      
+
         	var y = d3.scaleLinear()
                       .rangeRound([hei, 0]);
-                      
+
             if (param.yrange === null){
                 y.domain([y_dom[0] - (y_range * 0.05), y_dom[1] + (y_range * 0.05)]);
             } else {
                 y.domain(param.yrange);
             }
-        	
+
       	    var g = svg.append("g")
     	    	       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    	    	       
+
            // add the x and y axes
 	     	g.append("g")
     	     	  .attr('transform', 'translate(0,' + hei + ')')
@@ -120,7 +120,7 @@ HTMLWidgets.widget({
                 .attr("text-anchor", "middle")
                 .attr("transform", "translate("+ (width/2) +","+(height-(margin.bottom/3))+")")
                 .text(param.xlab);
-                
+
             // title and subtitle
             if (param.title !== null){
                 svg.append("text")
@@ -138,29 +138,29 @@ HTMLWidgets.widget({
                     .text(param.subtitle);
             }
 
-            //add tooltip 
+            //add tooltip
             var tiphtml = function(d) {
                 var keys = param.tooltip === null ? ['x','y','name'] : param.tooltip;
                 var ret = "";
-                
-                
+
+
                 if (!Array.isArray(keys)){
                     ret = "<strong>"+keys+"</strong> <span style='color:red; float:right'>" + d[keys] + "</span><br/>";
                 }else{
                     keys.forEach(function(k){
                         ret += "<strong>"+k+"</strong> <span style='color:red; float:right'>" + d[k] + "</span><br/>";
-                    });                    
+                    });
                 }
                 return ret;
             };
-            
+
             var tool_tip = d3.tip()
     	                     .attr('class', 'd3-tip')
 			                 .offset([-10, 0])
 			                 .html(tiphtml);
             svg.call(tool_tip);
-           
-            //draw the dots         
+
+            //draw the dots
             g.selectAll(".dot")
                 .data(d3data)
                 .enter().append("circle")
@@ -170,7 +170,7 @@ HTMLWidgets.widget({
                     .attr("cy", function(d) { return y(d.y); })
                     .style("fill", function(d) { return d.col; })
                     .on('mouseover', tool_tip.show)
-                    .on('mouseout',  tool_tip.hide);   
+                    .on('mouseout',  tool_tip.hide);
 
             // Lasso functions
             var lasso_start = function() {
@@ -188,22 +188,22 @@ HTMLWidgets.widget({
                     .classed("not_possible",true)
                     .classed("possible",false);
             };
-        
+
             var lasso_end = function() {
                 // Reset the color of all dots
                 lasso.items()
                     .classed("not_possible",false)
                     .classed("possible",false);
-    
+
                 // Style the selected dots
                 lasso.selectedItems()
                     .classed("selected",true)
                     .attr("r",param.dotsize * 2);
-                    
+
                 var ret = lasso.selectedItems();
                 Shiny.onInputChange(param.callback,
                                     ret.nodes().map(function(d) { return d.__data__.name; }) );
-                                    
+
                 // Reset the style of the not selected dots
                 lasso.notSelectedItems()
                     .attr("r",param.dotsize);
@@ -218,25 +218,25 @@ HTMLWidgets.widget({
                 .on("draw",lasso_draw)
                 .on("end",lasso_end);
             svg.call(lasso);
-            
+
             if (param.legend !== null){
-                // reshape the legend data so D3 can play around with it            
+                // reshape the legend data so D3 can play around with it
                 var d3legend = HTMLWidgets.dataframeToD3(param.legend);
-                
+
                 // add a legend object for each item
                 var legend = g.selectAll(".legend")
                                 .data(d3legend)
                                    .enter().append("g")
                                    .attr("class", "legend")
                                    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-                                
+
                 // add a rectangle on each element
                 legend.append("rect")
                       .attr("x", wid - 18)
                       .attr("width", 18)
                       .attr("height", 18)
                       .style("fill", function(d) { return d.col; });
-                               
+
                 // add the text to each element
                 legend.append("text")
                       .attr("x", wid - 24)
@@ -245,7 +245,7 @@ HTMLWidgets.widget({
                       .style("text-anchor", "end")
                       .text(function(d) { return d.name; });
             }
-            
+
 
         }
     };

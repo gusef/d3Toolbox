@@ -1,6 +1,6 @@
 HTMLWidgets.widget({
 
-    name: 'D3Boxplot',
+    name: 'd3Boxplot',
 
     type: 'output',
 
@@ -35,13 +35,13 @@ HTMLWidgets.widget({
            	              "legend" : x.legend,
                           "callback" : x.callback_handler
            	};
-       	
-            //Special case where there is only one list element 
+
+            //Special case where there is only one list element
             if (typeof(this.param.names) === 'string'){
                 this.param.names = [this.param.names];
                 this.param.col = [this.param.col];
-            }          
-           	
+            }
+
             this.redraw(this.data, this.param, this.stats, this.outliers, width, height);
         },
 
@@ -72,7 +72,7 @@ HTMLWidgets.widget({
                       .domain(param.names)
                       .rangeRound([0, wid])
                       .padding(0.2);
-                      
+
         	var y = d3.scaleLinear()
                       .domain([param.range[0],param.range[1]])
         	          .rangeRound([hei, 0]);
@@ -119,7 +119,7 @@ HTMLWidgets.widget({
             }
 
             var d3data = HTMLWidgets.dataframeToD3(stats);
-  
+
             // Add center line
             g.selectAll("line.center")
                 .data(d3data)

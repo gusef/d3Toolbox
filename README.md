@@ -8,7 +8,7 @@ library(devtools)
 install_github("gusef/d3Toolbox")
 ```
 
-## Simple Barplot
+## Simple Scatterplot
 ```{r simple_scatter, warning=FALSE, eval=FALSE}
 require(d3Toolbox)
 data("iris")
@@ -20,7 +20,7 @@ data <- data.frame(x=iris$Sepal.Length,
 legend <- data.frame(col=c('steelblue','orange','black'),
                      name=levels(iris$Species))
     
-D3Scatter(data,
+d3Scatter(data,
           col=c('steelblue','orange','black')[as.numeric(iris$Species)],
           dotsize = 6,
           xlab='Sepal Length',
@@ -39,7 +39,7 @@ data <- lapply(levels(iris$Species),
                       function(x,y)y[y$Species==x,'Sepal.Length'],
                       iris)
 names(data) <- levels(iris$Species)
-D3Boxplot(data,
+d3Boxplot(data,
           col=c('steelblue','orange','grey'),
           dotsize = 3,
           showdots = F,
@@ -56,7 +56,7 @@ require(d3Toolbox)
 data <- 1:15
 names(data) <- c(LETTERS[1:15])
 
-D3Barplot(data,
+d3Barplot(data,
           col=c('steelblue'),
           xlab='Letters',
           ylab='Frequencies',
@@ -71,7 +71,7 @@ data <- data.frame(x=(1:15),
                    z=15:1)
 rownames(data) <- c(LETTERS[1:15])
 
-D3Barplot(data,
+d3Barplot(data,
           col=c('steelblue','grey','#de2d26'),
           tooltip=c(paste0('letter_',LETTERS[1:15])),
           xlab='Letters',

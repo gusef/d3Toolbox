@@ -5,14 +5,14 @@
 #' @import htmlwidgets
 #'
 #' @export
-D3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', padding=0.1,
+d3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', padding=0.1,
                       title='', subtitle='', callback_handler='BarSelection', yrange=NULL,
                       width = NULL, height = NULL, elementId = NULL) {
 
     if (!is.null(yrange) && length(yrange) != 2){
         stop("If yrange is specified it needs to have a length of 2")
     }
-    
+
     #Fix the coloring
     col <- gplots::col2hex(col)
 
@@ -53,11 +53,11 @@ D3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', 
 
   # create widget
   htmlwidgets::createWidget(
-    name = 'D3Barplot',
+    name = 'd3Barplot',
     x,
     width = width,
     height = height,
-    package = 'D3Barplot',
+    package = 'd3Toolbox',
     elementId = elementId,
     sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
   )
@@ -77,16 +77,16 @@ D3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', 
 #' @param quoted Is \code{expr} a quoted expression (with \code{quote()})? This
 #'   is useful if you want to save an expression in a variable.
 #'
-#' @name D3Barplot-shiny
+#' @name d3Barplot-shiny
 #'
 #' @export
-D3BarplotOutput <- function(outputId, width = '100%', height = '400px'){
-  htmlwidgets::shinyWidgetOutput(outputId, 'D3Barplot', width, height, package = 'D3Barplot')
+d3BarplotOutput <- function(outputId, width = '100%', height = '400px'){
+  htmlwidgets::shinyWidgetOutput(outputId, 'd3Barplot', width, height, package = 'd3Toolbox')
 }
 
-#' @rdname D3Barplot-shiny
+#' @rdname d3Barplot-shiny
 #' @export
-renderD3Barplot <- function(expr, env = parent.frame(), quoted = FALSE) {
+renderd3Barplot <- function(expr, env = parent.frame(), quoted = FALSE) {
   if (!quoted) { expr <- substitute(expr) } # force quoted
-  htmlwidgets::shinyRenderWidget(expr, D3BarplotOutput, env, quoted = TRUE)
+  htmlwidgets::shinyRenderWidget(expr, d3BarplotOutput, env, quoted = TRUE)
 }

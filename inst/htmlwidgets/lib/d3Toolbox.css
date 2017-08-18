@@ -1,3 +1,28 @@
+.box {
+  stroke: #000;
+  stroke-width: 2;
+}
+.box:hover {
+  fill: lightgrey;
+}
+.center {
+  stroke: #000;
+  stroke-width: 2;
+  stroke-dasharray: 5,5;
+}
+.median {
+  stroke: #000;
+  stroke-width: 3;
+}
+.topwhisker {
+  stroke: #000;
+  stroke-width: 2;
+}
+.bottomwhisker {
+  stroke: #000;
+  stroke-width: 2;
+}
+
 .axis line {
   fill: none;
   stroke: #000;
@@ -6,6 +31,15 @@
 
 .dot {
   stroke: #000;
+  stroke-width: 1;
+}
+
+.bar:hover {
+  fill: lightgrey;
+}
+
+.stackbar:hover {
+  fill: lightgrey;
 }
 
 .lasso path {

@@ -5,7 +5,7 @@
 #' @import htmlwidgets
 #'
 #' @export
-D3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
+d3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
                       dotsize =2, xlab='', ylab='', title=NULL, subtitle=NULL,
                       callback_handler='BoxplotSelection', legend=NULL,
                       width = NULL, height = NULL, elementId = NULL) {
@@ -14,7 +14,7 @@ D3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
     if (class(data) == "numeric"){
         data <- list(x=data)
     }
-    
+
     #Fix the coloring
     col <- gplots::col2hex(col)
     dotcol <- col2hex(dotcol)
@@ -80,11 +80,11 @@ D3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
     )
   # create widget
   htmlwidgets::createWidget(
-    name = 'D3Boxplot',
+    name = 'd3Boxplot',
     x,
     width = width,
     height = height,
-    package = 'D3Boxplot',
+    package = 'd3Toolbox',
     elementId = elementId,
     sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
   )
@@ -104,16 +104,16 @@ D3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
 #' @param quoted Is \code{expr} a quoted expression (with \code{quote()})? This
 #'   is useful if you want to save an expression in a variable.
 #'
-#' @name D3Boxplot-shiny
+#' @name d3Boxplot-shiny
 #'
 #' @export
-D3BoxplotOutput <- function(outputId, width = '100%', height = '400px'){
-  htmlwidgets::shinyWidgetOutput(outputId, 'D3Boxplot', width, height, package = 'D3Boxplot')
+d3BoxplotOutput <- function(outputId, width = '100%', height = '400px'){
+  htmlwidgets::shinyWidgetOutput(outputId, 'd3Boxplot', width, height, package = 'd3Toolbox')
 }
 
-#' @rdname D3Boxplot-shiny
+#' @rdname d3Boxplot-shiny
 #' @export
-renderD3Boxplot <- function(expr, env = parent.frame(), quoted = FALSE) {
+renderd3Boxplot <- function(expr, env = parent.frame(), quoted = FALSE) {
   if (!quoted) { expr <- substitute(expr) } # force quoted
-  htmlwidgets::shinyRenderWidget(expr, D3BoxplotOutput, env, quoted = TRUE)
+  htmlwidgets::shinyRenderWidget(expr, d3BoxplotOutput, env, quoted = TRUE)
 }

@@ -1,6 +1,6 @@
 HTMLWidgets.widget({
 
-  name: 'D3Barplot',
+  name: 'd3Barplot',
 
   type: 'output',
 
@@ -173,20 +173,20 @@ HTMLWidgets.widget({
                       .attr("width", x.bandwidth())
                       .on('mouseover', (param.tooltip) ? tool_tip.show : null)
                       .on('mouseout',  (param.tooltip) ? tool_tip.hide : null)
-                      .on("click", function(d) { 
+                      .on("click", function(d) {
                                      var current = null;
                                      var counter = 0;
                                      Object.keys(d.data).forEach(function(key,index) {
                                         counter += d.data[key];
                                         if(counter === d[1]) {
                                             current = key;
-                                        }   
+                                        }
                                      });
                                      return Shiny.onInputChange(param.callback,
                                                                 {'x_val' : d.data.name,
                                                                  'y_val' : current
                                                                 });
-                                }); 
+                                });
 
             }
    	    }
