@@ -16,10 +16,21 @@
 
 .link {
   fill: none;
-  stroke: #555;
-  stroke-opacity: 0.4;
+  stroke: #000;
+  stroke-opacity: 1.0;
+  stroke-width: 1.5;
+}
+
+.link--active {
+  stroke: #f00 !important;
   stroke-width: 1.5px;
 }
+
+.label--active {
+  font-weight: bold;
+  color: #f00;
+}
+
 
 .box {
   stroke: #000;

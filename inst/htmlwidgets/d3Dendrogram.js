@@ -28,7 +28,9 @@ HTMLWidgets.widget({
             this.tree = x.tree;
 
            	this.param = {
-           	};
+                "classic" : x.classic_tree,
+                "label" : x.label
+            };
 
             this.redraw(this.tree, this.param, wid, hei);
         },
@@ -65,35 +67,59 @@ HTMLWidgets.widget({
 
             cluster(root);
 
-            console.log(root);
+            var link;
+            if (param.classic){
+                
+                link = g.selectAll(".link")
+                        .data(root.descendants().slice(1))
+                        .enter().append("g");
+                link.append("line")
+                        .attr("class", "link")
+                        .attr("x1", function(d) { return d.parent.y; } )
+                        .attr("y1", function(d) { return d.parent.x; })
+                        .attr("x2", function(d, i) { return d.parent.y; } )
+                        .attr("y2", function(d) { return d.x; });
+                link.append("line")
+                    .attr("class", "link")
+                    .attr("x1", function(d) { return d.parent.y; } )
+                    .attr("y1", function(d) { return d.x; })
+                    .attr("x2", function(d, i) { return d.y; } )
+                    .attr("y2", function(d) { return d.x; });
+                link.on("mouseover", mouseov(true))
+                    .on("mouseout", mouseov(false));
 
-            var link = g.selectAll(".link")
-                  .data(root.descendants().slice(1))
-                .enter().append("path")
-                  .attr("class", "link")
-                  .attr("d", function(d) {
-                    return "M" + d.y + "," + d.x
-                        + "C" + (d.parent.y + 5) + "," + d.x
-                        + " " + (d.parent.y + 5) + "," + d.parent.x
-                        + " " + d.parent.y + "," + d.parent.x;
-            });
-
+            } else {
+                
+                link = g.selectAll(".link")
+                      .data(root.descendants().slice(1))
+                    .enter().append("path")
+                      .attr("class", "link")
+                      .attr("d", function(d) {
+                        return "M" + d.y + "," + d.x
+                            + "C" + (d.parent.y + 5) + "," + d.x
+                            + " " + (d.parent.y + 5) + "," + d.parent.x
+                            + " " + d.parent.y + "," + d.parent.x;});
+            }
+            
             var node = g.selectAll(".node")
                   .data(root.descendants())
                 .enter().append("g")
                   .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
                   .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
-              node.append("circle")
-                  .attr("r", 2.5);
-
-              node.append("text")
-                  .attr("dy", 3)
-                  .attr("x", function(d) { return d.children ? -8 : 8; })
-                  .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
-                  .text(function(d) { return d.data.label; });
-
-
+            if (param.label){
+                node.append("text")
+                    .attr("dy", 3)
+                    .attr("x", 8)
+                    .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+                    .text(function(d) { return d.data.label; });
+            }
+            
+            function mouseov(active) {
+                return function(d) {
+                    d3.select(this).classed("link--active", active); };
+            }
+            
         }
     };
   }
