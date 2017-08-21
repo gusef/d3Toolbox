@@ -5,7 +5,8 @@
 #' @import htmlwidgets
 #'
 #' @export
-d3Dendrogram <- function(dend, label = TRUE, classic_tree = TRUE, 
+d3Dendrogram <- function(dend, horiz = FALSE, label = TRUE, classic_tree = TRUE,
+                         lab_adj = 120, callback_handler="DendSelection",
                          width = NULL, height = NULL, elementId = NULL) {
 
     if (class(dend) != 'dendrogram'){
@@ -17,8 +18,11 @@ d3Dendrogram <- function(dend, label = TRUE, classic_tree = TRUE,
     # forward options using x
     x = list(
         tree = tree,
+        horiz = horiz,
         label = label,
-        classic_tree = classic_tree
+        lab_adj = lab_adj,
+        classic_tree = classic_tree,
+        callback_handler = callback_handler
     )
 
   # create widget
