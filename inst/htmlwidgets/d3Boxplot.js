@@ -33,6 +33,7 @@ HTMLWidgets.widget({
                           "title" : x.title,
            	              "subtitle" : x.subtitle,
            	              "legend" : x.legend,
+           	              "margins" : x.margins,
                           "callback" : x.callback_handler
            	};
 
@@ -57,7 +58,8 @@ HTMLWidgets.widget({
         },
 
         redraw: function(data, param, stats, outlier, width, height) {
-           	var margin = {top: 40, right: 20, bottom: 50, left: 60};
+
+           	var margin = param.margins;
 
     		//if there is a title add more margin
     		if (param.title !== ''){

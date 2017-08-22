@@ -7,7 +7,14 @@
 #' @export
 d3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', padding=0.1,
                       title='', subtitle='', callback_handler='BarSelection', yrange=NULL,
-                      width = NULL, height = NULL, elementId = NULL) {
+                      margins = NULL, width = NULL, height = NULL, elementId = NULL) {
+
+    if (is.null(margins)){
+        margins <- list(top = 40,
+                        right = 20,
+                        bottom = 50,
+                        left = 60)
+    }
 
     if (!is.null(yrange) && length(yrange) != 2){
         stop("If yrange is specified it needs to have a length of 2")
@@ -48,6 +55,7 @@ d3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', 
         title = title,
         max_value = max(rowSums(data)),
         subtitle = subtitle,
+        margins=margins,
         callback_handler = callback_handler
     )
 

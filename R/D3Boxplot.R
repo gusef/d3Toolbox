@@ -6,9 +6,16 @@
 #'
 #' @export
 d3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
-                      dotsize =2, xlab='', ylab='', title=NULL, subtitle=NULL,
+                      dotsize =2, xlab='', ylab='', title=NULL, subtitle=NULL, margins = NULL,
                       callback_handler='BoxplotSelection', legend=NULL,
                       width = NULL, height = NULL, elementId = NULL) {
+
+    if (is.null(margins)){
+        margins <- list(top = 40,
+                        right = 20,
+                        bottom = 50,
+                        left = 60)
+    }
 
     #check if the data is a single vector
     if (class(data) == "numeric"){
@@ -76,6 +83,7 @@ d3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
         title = title,
         subtitle = subtitle,
         legend=legend,
+        margins=margins,
         callback_handler = callback_handler
     )
   # create widget

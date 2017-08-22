@@ -26,6 +26,7 @@ HTMLWidgets.widget({
            	              "title" : x.title,
            	              "subtitle" : x.subtitle,
                           "max_value" : x.max_value,
+                          "margins" : x.margins,
            	              "callback" : x.callback_handler
            	    };
 
@@ -50,9 +51,7 @@ HTMLWidgets.widget({
 
         redraw: function(data, param, width, height) {
 
-            d3data = HTMLWidgets.dataframeToD3(data);
-
-    		var margin = {top: 40, right: 20, bottom: 50, left: 60};
+    		var margin = param.margins;
 
     		//if there is a title add more margin
     		if (param.title !== ''){
@@ -118,6 +117,8 @@ HTMLWidgets.widget({
 	       var tool_tip = d3.tip()
     	                    .attr('class', 'd3-tip')
 			                .offset([-10, 0]);
+
+            d3data = HTMLWidgets.dataframeToD3(data);
 
            if (param.singleVar){
 

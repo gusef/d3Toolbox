@@ -8,9 +8,16 @@
 d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
                       title=NULL, subtitle=NULL, callback_handler='ScatterSelection',
                       tooltip=NULL, legend=NULL ,width = NULL, height = NULL,
-                      xrange=NULL, yrange=NULL,
+                      xrange=NULL, yrange=NULL, margins = NULL,
                       col_scale = RColorBrewer::brewer.pal(11,"RdBu")[11:1],
                       elementId = NULL) {
+
+    if (is.null(margins)){
+        margins <- list(top = 40,
+                        right = 20,
+                        bottom = 50,
+                        left = 60)
+    }
 
     #if a numeric value was provided use the color scale to transform
     if (is.numeric(col)){
@@ -66,6 +73,7 @@ d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
         subtitle = subtitle,
         tooltip=tooltip,
         legend=legend,
+        margins=margins,
         callback_handler = callback_handler
     )
 

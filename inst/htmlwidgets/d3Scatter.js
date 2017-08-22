@@ -35,6 +35,7 @@ HTMLWidgets.widget({
            	              "subtitle" : x.subtitle,
            	              "tooltip" : x.tooltip,
            	              "legend" : x.legend,
+           	              "margins" : x.margins,
                           "callback" : x.callback_handler
            	};
             this.redraw(this.data, this.param, wid, hei);
@@ -56,7 +57,7 @@ HTMLWidgets.widget({
         redraw: function(data, param, width, height) {
             d3data = HTMLWidgets.dataframeToD3(data);
 
-    		var margin = {top: 40, right: 20, bottom: 50, left: 60};
+    		var margin = param.margins;
 
     		//if there is a title add more margin
     		if (param.title !== ''){

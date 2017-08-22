@@ -32,6 +32,7 @@ HTMLWidgets.widget({
                 "label" : x.label,
                 "lab_adj" : x.lab_adj,
                 "classic" : x.classic_tree,
+                "margins" : x.margins,
                 "callback" : x.callback_handler
             };
 
@@ -50,7 +51,7 @@ HTMLWidgets.widget({
 
         redraw: function(tree, param, width, height) {
 
-        	var margin = {top: 40, right: 20, bottom: 50, left: 60};
+        	var margin = param.margins;
 	    	var wid = width - margin.left - margin.right;
 		    var hei = height - margin.top - margin.bottom;
 
@@ -85,9 +86,7 @@ HTMLWidgets.widget({
                        .domain([0,root.data.height])
                        .rangeRound([Math.max.apply(null,tree_hei),
                                     Math.min.apply(null,tree_hei)]);
-            root.each(function(d){ d.y = sc(d.data.height);
-
-                                  });
+            root.each(function(d){ d.y = sc(d.data.height); });
 
             // generate a connector group
             var link = g.selectAll(".link")

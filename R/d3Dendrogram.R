@@ -6,8 +6,15 @@
 #'
 #' @export
 d3Dendrogram <- function(dend, horiz = FALSE, label = TRUE, classic_tree = TRUE,
-                         lab_adj = 120, callback_handler="DendSelection",
+                         lab_adj = 120, margins = NULL, callback_handler="DendSelection",
                          width = NULL, height = NULL, elementId = NULL) {
+
+    if (is.null(margins)){
+        margins <- list(top = 40,
+                        right = 20,
+                        bottom = 50,
+                        left = 60)
+    }
 
     if (class(dend) != 'dendrogram'){
         stop('Object dend needs to be a dendrogram')
@@ -22,6 +29,7 @@ d3Dendrogram <- function(dend, horiz = FALSE, label = TRUE, classic_tree = TRUE,
         label = label,
         lab_adj = lab_adj,
         classic_tree = classic_tree,
+        margins=margins,
         callback_handler = callback_handler
     )
 
