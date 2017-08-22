@@ -29,9 +29,9 @@ HTMLWidgets.widget({
 
            	this.param = {
            	    "horiz" : x.horiz,
-                "classic" : x.classic_tree,
                 "label" : x.label,
                 "lab_adj" : x.lab_adj,
+                "classic" : x.classic_tree,
                 "callback" : x.callback_handler
             };
 
@@ -83,7 +83,8 @@ HTMLWidgets.widget({
 
             var sc = d3.scaleLinear()
                        .domain([0,root.data.height])
-                       .rangeRound([Math.max(...tree_hei), Math.min(...tree_hei)]);
+                       .rangeRound([Math.max.apply(null,tree_hei),
+                                    Math.min.apply(null,tree_hei)]);
             root.each(function(d){ d.y = sc(d.data.height);
 
                                   });

@@ -80,7 +80,23 @@ d3Barplot(data,
           subtitle='with subtitle')
 ```
 
+## Dendrograms
+```{r dendrogram1, eval=FALSE}
+dat <- t(mtcars)
+hc01.col <- hcopt(dist(t(dat)),method="ward.D")
+dend <- as.dendrogram(hc01.col)
+d3Dendrogram(dend,
+             horiz=T)
+```
 
-
+```{r dendrogram2, eval=FALSE}
+dat <- mtcars
+hc01.col <- hcopt(dist(t(dat)),method="ward.D")
+dend <- as.dendrogram(hc01.col)
+d3Dendrogram(dend,
+             lab_adj = 40,
+             classic_tree = F,
+             callback_handler="DendSelection")
+```
 ## Shiny
 There are several Shiny examples using all these plots in the example directory.
