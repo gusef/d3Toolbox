@@ -9,6 +9,10 @@ install_github("gusef/d3Toolbox")
 ```
 
 ## Simple Scatterplot
+
+![example](https://raw.github.com/gusef/d3Toolbox/master/resources/scatter.gif)
+
+
 ```{r simple_scatter, warning=FALSE, eval=FALSE}
 require(d3Toolbox)
 data("iris")
@@ -32,25 +36,10 @@ d3Scatter(data,
           callback_handler='ScatterSelection')
 ```
 
-## Simple Boxplot
-```{r simple_box, warning=FALSE, eval=FALSE}
-require(d3Toolbox)
-data <- lapply(levels(iris$Species),
-                      function(x,y)y[y$Species==x,'Sepal.Length'],
-                      iris)
-names(data) <- levels(iris$Species)
-d3Boxplot(data,
-          col=c('steelblue','orange','grey'),
-          dotsize = 3,
-          showdots = F,
-          xlab='Sepal Length',
-          ylab='Sepal Width',
-          title='Iris dataset',
-          subtitle='subtitle',
-          callback_handler='ScatterSelection')
-```
-
 ## Simple Barplot
+
+![example](https://raw.github.com/gusef/d3Toolbox/master/resources/barplot.gif)
+
 ```{r simple_barplot, warning=FALSE, eval=FALSE}
 require(d3Toolbox)
 data <- 1:15
@@ -80,7 +69,31 @@ d3Barplot(data,
           subtitle='with subtitle')
 ```
 
+## Simple Boxplot
+
+![example](https://raw.github.com/gusef/d3Toolbox/master/resources/boxplot.gif)
+
+```{r simple_box, warning=FALSE, eval=FALSE}
+require(d3Toolbox)
+data <- lapply(levels(iris$Species),
+                      function(x,y)y[y$Species==x,'Sepal.Length'],
+                      iris)
+names(data) <- levels(iris$Species)
+d3Boxplot(data,
+          col=c('steelblue','orange','grey'),
+          dotsize = 3,
+          showdots = F,
+          xlab='Sepal Length',
+          ylab='Sepal Width',
+          title='Iris dataset',
+          subtitle='subtitle',
+          callback_handler='ScatterSelection')
+```
+
 ## Dendrograms
+
+![example](https://raw.github.com/gusef/d3Toolbox/master/resources/dendrogram.gif)
+
 ```{r dendrogram1, eval=FALSE}
 dat <- t(mtcars)
 hc01.col <- hcopt(dist(t(dat)),method="ward.D")
@@ -100,3 +113,11 @@ d3Dendrogram(dend,
 ```
 ## Shiny
 There are several Shiny examples using all these plots in the example directory.
+
+
+## Credits
+
+-   RStudio's [shiny](http://shiny.rstudio.com/) and [htmlwidgets](http://www.htmlwidgets.org/) packages
+-   Michael Bostock' [d3.js](https://d3js.org/)
+-   Speros Kokenes' [d3 lasso plugin](https://github.com/skokenes/D3-Lasso-Plugin)
+
