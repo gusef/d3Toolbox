@@ -6,7 +6,8 @@
 #'
 #' @export
 d3Dendrogram <- function(dend, horiz = FALSE, label = TRUE, classic_tree = TRUE,
-                         lab_adj = 120, margins = NULL, callback_handler="DendSelection",
+                         lab_adj = 120, title=NULL, subtitle=NULL, axis=TRUE,
+                         margins = NULL, callback_handler="DendSelection",
                          width = NULL, height = NULL, elementId = NULL) {
 
     if (is.null(margins)){
@@ -29,6 +30,9 @@ d3Dendrogram <- function(dend, horiz = FALSE, label = TRUE, classic_tree = TRUE,
         label = label,
         lab_adj = lab_adj,
         classic_tree = classic_tree,
+        axis = axis,
+        title = title,
+        subtitle = subtitle,
         margins=margins,
         callback_handler = callback_handler
     )

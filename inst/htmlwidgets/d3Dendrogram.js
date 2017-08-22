@@ -12,7 +12,6 @@ HTMLWidgets.widget({
         var wid = null;
         var hei = null;
 
-
     return {
 
         renderValue: function(x) {
@@ -32,6 +31,9 @@ HTMLWidgets.widget({
                 "label" : x.label,
                 "lab_adj" : x.lab_adj,
                 "classic" : x.classic_tree,
+                "axis" : x.axis,
+                "title" : x.title,
+                "subtitle" : x.subtitle,
                 "margins" : x.margins,
                 "callback" : x.callback_handler
             };
@@ -52,9 +54,31 @@ HTMLWidgets.widget({
         redraw: function(tree, param, width, height) {
 
         	var margin = param.margins;
+
+    		//if there is a title add more margin
+    		if (param.title !== ''){
+    		    margin.top += 40;
+    		}
+
 	    	var wid = width - margin.left - margin.right;
 		    var hei = height - margin.top - margin.bottom;
 
+            // title and subtitle
+            if (param.title !== null){
+                svg.append("text")
+                    .attr("text-anchor", "middle")
+                    .attr("transform", "translate("+ (width/2) +","+((margin.top/3))+")")
+                    .attr("font-size", "24px")
+                    .text(param.title);
+            }
+
+            if (param.subtitle !== null){
+                svg.append("text")
+                    .attr("text-anchor", "middle")
+                    .attr("transform", "translate("+ (width/2) +","+((2*margin.top/3))+")")
+                    .attr("font-size", "15px")
+                    .text(param.subtitle);
+            }
 
             //generate a tree
     	    var cluster = d3.cluster()
@@ -87,6 +111,21 @@ HTMLWidgets.widget({
                        .rangeRound([Math.max.apply(null,tree_hei),
                                     Math.min.apply(null,tree_hei)]);
             root.each(function(d){ d.y = sc(d.data.height); });
+
+
+            // add the axis
+            if (param.axis){
+                if (param.horiz){
+        	    	g.append("g")
+                 	 .attr('transform', 'translate(0,' + hei + ')')
+        	 		 .attr("class", "axis axis--x")
+        		     .call(d3.axisBottom(sc));
+                } else {
+                    g.append("g")
+			         .attr("class", "axis axis--y")
+			         .call(d3.axisLeft(sc));
+                }
+            }
 
             // generate a connector group
             var link = g.selectAll(".link")
