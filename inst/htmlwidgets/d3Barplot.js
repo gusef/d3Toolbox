@@ -62,14 +62,16 @@ HTMLWidgets.widget({
 		    var hei = height - margin.top - margin.bottom;
 
             // scales
-            var x = d3.scaleBand().rangeRound([0, wid]).padding(param.padding);
+            var x = d3.scaleBand()
+                      .domain(data.name)
+                      .rangeRound([0, wid])
+                      .padding(param.padding);
         	var y = d3.scaleLinear().rangeRound([hei, 0]);
 
       	    var g = svg.append("g")
 		    	       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             //specify the ranges
-	   	    x.domain(data.name);
 	   	    if (param.yrange === null){
                 y.domain([0, param.max_value]);
             } else {

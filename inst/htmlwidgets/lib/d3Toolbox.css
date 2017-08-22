@@ -71,10 +71,17 @@
   stroke-width: 1;
 }
 
+.bar {
+  stroke: #000;
+  stroke-width: 1;
+}
 .bar:hover {
   fill: lightgrey;
 }
-
+.stackbar {
+  stroke: #000;
+  stroke-width: 1;
+}
 .stackbar:hover {
   fill: lightgrey;
 }
