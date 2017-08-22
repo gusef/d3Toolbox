@@ -120,4 +120,5 @@ There are several Shiny examples using all these plots in the example directory.
 -   RStudio's [shiny](http://shiny.rstudio.com/) and [htmlwidgets](http://www.htmlwidgets.org/) packages
 -   Michael Bostock' [d3.js](https://d3js.org/)
 -   Speros Kokenes' [d3 lasso plugin](https://github.com/skokenes/D3-Lasso-Plugin)
+-   Julien Barnier' [scatterD3](https://github.com/juba/scatterD3)
 
