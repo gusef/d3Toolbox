@@ -11,7 +11,7 @@ ui <- fillPage(fillRow(
     d3BarplotOutput("filterpanel", width = "100%", height = "100%"),
     d3ScatterOutput("lowdimpanel", width = "100%", height = "100%")
   ),flex = c(2,1))
-  ,tags$head(tags$script(src="D3Image.js"))
+ # ,tags$head(tags$script(src="D3Image.js"))
 )
 
 server <- function(input, output, session) {
@@ -52,7 +52,7 @@ server <- function(input, output, session) {
                   subtitle='with subtitle')
     })
 
-    output$tSNE_panel <- renderd3Boxplot({
+    output$tSNE_panel <- renderd3Image({
         x <- t(mtcars)
         rm <- rowMeans(x, na.rm = F)
         x <- sweep(x, 1, rm)

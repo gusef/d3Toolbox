@@ -60,6 +60,10 @@
   stroke-width: 2;
 }
 
+.selectlabel {
+  cursor: pointer;
+}
+
 .axis line {
   fill: none;
   stroke: #000;
