@@ -5,7 +5,7 @@
 #' @import htmlwidgets
 #'
 #' @export
-d3Image <- function(mat, xlab = '', ylab = '',
+d3Image <- function(mat, xlab = '', ylab = '', raw_values = NULL,
                     show_xlabs = !is.null(colnames(mat)),
                     show_ylabs = !is.null(rownames(mat)),
                     allow_NA = FALSE,
@@ -21,6 +21,14 @@ d3Image <- function(mat, xlab = '', ylab = '',
                         left = 60)
     }
 
+    if (!is.null(raw_values)){
+        if (!all(dim(raw_values) == dim(mat))){
+            stop("The raw_values matrix needs to have the same dimensions as the matrix")
+        }
+    }else{
+        raw_values <- mat
+    }
+
     if (!allow_NA && sum(is.na(mat)) >0){
         stop('NA values detected, please set allow_NA=TRUE')
     }
@@ -28,10 +36,20 @@ d3Image <- function(mat, xlab = '', ylab = '',
     #coloring
     col_scale <- gplots::col2hex(col_scale)
 
+
+    breaks <- seq(min(mat, na.rm = T),
+                  max(mat, na.rm = T),
+                  length = length(col_scale) + 1 )
+
+    grps <- cut(mat, breaks = breaks, include.lowest = TRUE)
+    col <- col_scale[grps]
+    col <- matrix(col, ncol=ncol(mat))
+
+
     # forward options using x
     x = list(
-        data = mat,
-        colors = col_scale,
+        data = col,
+        raw_values = raw_values,
         xlab = xlab,
         ylab = ylab,
         xax = colnames(mat),

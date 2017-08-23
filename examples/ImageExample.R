@@ -11,7 +11,7 @@ ui <- fillPage(fillRow(
     d3BarplotOutput("filterpanel", width = "100%", height = "100%"),
     d3ScatterOutput("lowdimpanel", width = "100%", height = "100%")
   ),flex = c(2,1))
- # ,tags$head(tags$script(src="D3Image.js"))
+  ,tags$head(tags$script(src="D3Image.js"))
 )
 
 server <- function(input, output, session) {
@@ -60,6 +60,7 @@ server <- function(input, output, session) {
         x <- sweep(x, 1, sx, "/")
 
         d3Image(mat=x,
+                raw_values=t(mtcars),
                 xlab='Cars',
                 ylab='Features',
                 margins=list(top = 40,

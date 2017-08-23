@@ -8,6 +8,7 @@ HTMLWidgets.widget({
 
         var svg  = null;
         var data = null;
+        var raw_values = null;
         var param = null;
         var wid = null;
         var hei = null;
@@ -26,11 +27,11 @@ HTMLWidgets.widget({
                      .attr("width", wid)
                      .attr("height", hei);
             this.data = x.data;
+            this.raw_values = x.raw_values;
            	this.param = {"xlab" : x.xlab,
                           "ylab" : x.ylab,
                           "xax" : x.xax,
                           "yax" : x.yax,
-                          "colors" : x.colors,
                           "title" : x.title,
                           "subtitle" : x.subtitle,
                           "margins" : x.margins,
@@ -38,7 +39,7 @@ HTMLWidgets.widget({
                           "show_yax" : x.show_yax,
                           "callback" : x.callback_handler
            	};
-            this.redraw(this.data, this.param, wid, hei);
+            this.redraw(this.data, this.raw_values, this.param, wid, hei);
         },
 
         resize: function(width, height) {
@@ -51,10 +52,10 @@ HTMLWidgets.widget({
 	        d3.select(el).select("svg").selectAll("g").remove();
 	        d3.select(el).select("svg").selectAll("text").remove();
 	        d3.select(el).selectAll("d3-tip").remove();
-	        this.redraw(this.data, this.param, width, height);
+	        this.redraw(this.data, this.raw_values, this.param, width, height);
         },
 
-        redraw: function(data, param, width, height) {
+        redraw: function(data, raw_values, param, width, height) {
 
     		var margin = param.margins;
             var top = param.title !== '' ? 40 : 0 ;
@@ -86,8 +87,8 @@ HTMLWidgets.widget({
 		    	             "translate(" + margin.left + "," + (margin.top + top) + ")");
 
             var xlab = d3.scaleBand()
-                      .domain(param.xax)
-                      .rangeRound([0, wid]);
+                         .domain(param.xax)
+                         .rangeRound([0, wid]);
 
             //show the labels on the bottom
             if (param.show_xax){
@@ -105,7 +106,7 @@ HTMLWidgets.widget({
 
             var ylab = d3.scaleBand()
                       .domain(param.yax)
-                      .rangeRound([0, hei]);
+                      .rangeRound([hei, 0]);
 
             //show the labels on the right
             if (param.show_yax){
@@ -137,21 +138,15 @@ HTMLWidgets.widget({
                       .domain(d3.range(data.length))
                       .rangeRound([hei, 0]);
 
-            // add a color scale
-            var ext = d3.extent(data);
-            var color = d3.scaleOrdinal()
-                .domain([d3.min(ext[0]),d3.max(ext[1])])
-                .range(param.colors);
-
            //add tooltip
             var tiphtml = function(d, i) {
-                var col = param.xax[d3.select(this).attr("column")];
-                var row = param.yax.slice();
-                row = row.reverse()[d3.select(d3.select(this).node().parentNode).attr("row")];
-                var ret = "<strong>Value:</strong> <span style='color:red; float:right'>" + Math.round(d * 100) / 100 + "</span><br/>";
-                ret += "<strong>x-label:</strong> <span style='color:white; float:right'>" + col + "</span><br/>";
-                ret += "<strong>y-label:</strong> <span style='color:white; float:right'>" + row + "</span><br/>";
-
+                var col = d3.select(this).attr("column");
+                var y_rev = param.yax.slice();
+                row = d3.select(d3.select(this).node().parentNode).attr("row");
+                var value = raw_values[row][col];
+                var ret = "<strong>Value:</strong> <span style='color:red; float:right'>" + Math.round(value * 100) / 100 + "</span><br/>";
+                ret += "<strong>x-label:</strong> <span style='color:white; float:right'>" + param.xax[col] + "</span><br/>";
+                ret += "<strong>y-label:</strong> <span style='color:white; float:right'>" + y_rev.reverse()[row] + "</span><br/>";
                 return ret;
             };
 
@@ -179,7 +174,7 @@ HTMLWidgets.widget({
                           .attr("column", function(d, i) { return i; } )
                           .attr("width", x.bandwidth())
                           .attr("height", y.bandwidth())
-                          .style("fill", function(d){ return color(d); })
+                          .style("fill", function(d){ return d; })
         			      .on('mouseover', tool_tip.show)
                           .on('mouseout',  tool_tip.hide);
 
