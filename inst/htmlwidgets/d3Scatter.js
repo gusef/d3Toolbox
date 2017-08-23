@@ -58,15 +58,10 @@ HTMLWidgets.widget({
             d3data = HTMLWidgets.dataframeToD3(data);
 
     		var margin = param.margins;
-
-    		//if there is a title add more margin
-    		if (param.title !== ''){
-    		    margin.top += 40;
-    		}
+            var top = param.title !== '' ? 40 : 0 ;
 
 	    	var wid = width - margin.left - margin.right;
-		    var hei = height - margin.top - margin.bottom;
-
+		    var hei = height - margin.top - margin.bottom - top;
 
             // get the data ranges and add a padding for nicer display
             var x_dom = d3.extent(data.x),
@@ -94,7 +89,7 @@ HTMLWidgets.widget({
             }
 
       	    var g = svg.append("g")
-    	    	       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    	    	       .attr("transform", "translate(" + margin.left + "," + (margin.top + top) + ")");
 
            // add the x and y axes
 	     	g.append("g")
@@ -121,7 +116,7 @@ HTMLWidgets.widget({
             if (param.title !== null){
                 svg.append("text")
                     .attr("text-anchor", "middle")
-                    .attr("transform", "translate("+ (width/2) +","+((margin.top/3))+")")
+                    .attr("transform", "translate("+ (width/2) +","+((margin.top+top)/3)+")")
                     .attr("font-size", "24px")
                     .text(param.title);
             }
@@ -129,7 +124,7 @@ HTMLWidgets.widget({
             if (param.subtitle !== null){
                 svg.append("text")
                     .attr("text-anchor", "middle")
-                    .attr("transform", "translate("+ (width/2) +","+((2*margin.top/3))+")")
+                    .attr("transform", "translate("+ (width/2) +","+(2*(margin.top+top)/3)+")")
                     .attr("font-size", "15px")
                     .text(param.subtitle);
             }

@@ -52,14 +52,10 @@ HTMLWidgets.widget({
         redraw: function(data, param, width, height) {
 
     		var margin = param.margins;
-
-    		//if there is a title add more margin
-    		if (param.title !== ''){
-    		    margin.top += 40;
-    		}
+            var top = param.title !== '' ? 40 : 0 ;
 
 	    	var wid = width - margin.left - margin.right;
-		    var hei = height - margin.top - margin.bottom;
+		    var hei = height - margin.top - margin.bottom - top;
 
             // scales
             var x = d3.scaleBand()
@@ -69,7 +65,7 @@ HTMLWidgets.widget({
         	var y = d3.scaleLinear().rangeRound([hei, 0]);
 
       	    var g = svg.append("g")
-		    	       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		    	       .attr("transform", "translate(" + margin.left + "," + (margin.top + top) + ")");
 
             //specify the ranges
 	   	    if (param.yrange === null){
@@ -103,7 +99,7 @@ HTMLWidgets.widget({
            if (param.title !== ''){
                 svg.append("text")
                     .attr("text-anchor", "middle")
-                    .attr("transform", "translate("+ (width/2) +","+((margin.top/3))+")")
+                    .attr("transform", "translate("+ (width/2) +","+((margin.top+top)/3)+")")
                     .attr("font-size", "24px")
                     .text(param.title);
            }
@@ -111,7 +107,7 @@ HTMLWidgets.widget({
            if (param.subtitle !== ''){
                 svg.append("text")
                     .attr("text-anchor", "middle")
-                    .attr("transform", "translate("+ (width/2) +","+((2*margin.top/3))+")")
+                    .attr("transform", "translate("+ (width/2) +","+(2*(margin.top+top)/3)+")")
                     .attr("font-size", "15px")
                     .text(param.subtitle);
            }

@@ -53,21 +53,17 @@ HTMLWidgets.widget({
 
         redraw: function(tree, param, width, height) {
 
-        	var margin = param.margins;
-
-    		//if there is a title add more margin
-    		if (param.title !== ''){
-    		    margin.top += 40;
-    		}
+    		var margin = param.margins;
+            var top = param.title !== '' ? 40 : 0 ;
 
 	    	var wid = width - margin.left - margin.right;
-		    var hei = height - margin.top - margin.bottom;
+		    var hei = height - margin.top - margin.bottom - top;
 
             // title and subtitle
             if (param.title !== null){
                 svg.append("text")
                     .attr("text-anchor", "middle")
-                    .attr("transform", "translate("+ (width/2) +","+((margin.top/3))+")")
+                    .attr("transform", "translate("+ (width/2) +","+((margin.top+top)/3)+")")
                     .attr("font-size", "24px")
                     .text(param.title);
             }
@@ -75,7 +71,7 @@ HTMLWidgets.widget({
             if (param.subtitle !== null){
                 svg.append("text")
                     .attr("text-anchor", "middle")
-                    .attr("transform", "translate("+ (width/2) +","+((2*margin.top/3))+")")
+                    .attr("transform", "translate("+ (width/2) +","+((2*(margin.top+top)/3))+")")
                     .attr("font-size", "15px")
                     .text(param.subtitle);
             }
@@ -97,7 +93,7 @@ HTMLWidgets.widget({
             }
 
      	    var g = svg.append("g")
-    	    	       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    	    	       .attr("transform", "translate(" + margin.left + "," + (margin.top + top) + ")");
 
 
             var root = d3.hierarchy(tree, function(d) { return d.children; });
@@ -111,7 +107,6 @@ HTMLWidgets.widget({
                        .rangeRound([Math.max.apply(null,tree_hei),
                                     Math.min.apply(null,tree_hei)]);
             root.each(function(d){ d.y = sc(d.data.height); });
-
 
             // add the axis
             if (param.axis){
@@ -179,7 +174,7 @@ HTMLWidgets.widget({
                                 + " " + getX(d.parent) + "," + getY(d.parent)
                                 + " " + getX(d.parent) + "," + getY(d.parent); });
                 } else {
-                                        link.append("path")
+                    link.append("path")
                         .attr("class", "link link--curved")
                         .attr("d", function(d) {
                             return "M" + getX(d) + "," + getY(d)
