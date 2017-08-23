@@ -8,6 +8,7 @@
 d3Image <- function(mat, xlab = '', ylab = '',
                     show_xlabs = !is.null(colnames(mat)),
                     show_ylabs = !is.null(rownames(mat)),
+                    allow_NA = FALSE,
                     title=NULL, subtitle=NULL, callback_handler='ImageSelection',
                     width = NULL, height = NULL, margins = NULL,
                     col_scale = RColorBrewer::brewer.pal(11,"RdBu")[11:1],
@@ -18,6 +19,10 @@ d3Image <- function(mat, xlab = '', ylab = '',
                         right = 20,
                         bottom = 50,
                         left = 60)
+    }
+
+    if (!allow_NA && sum(is.na(mat)) >0){
+        stop('NA values detected, please set allow_NA=TRUE')
     }
 
     #coloring

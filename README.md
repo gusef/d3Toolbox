@@ -111,6 +111,30 @@ d3Dendrogram(dend,
              classic_tree = F,
              callback_handler="DendSelection")
 ```
+
+## Base heatmap
+
+![example](https://raw.github.com/gusef/d3Toolbox/master/resources/image.gif)
+```{r image, eval=FALSE}
+x <- t(mtcars)
+rm <- rowMeans(x, na.rm = F)
+x <- sweep(x, 1, rm)
+sx <- apply(x, 1, sd, na.rm = F)
+x <- sweep(x, 1, sx, "/")
+
+d3Image(mat=x,
+        xlab='Cars',
+        ylab='Features',
+        margins=list(top = 40,
+                     right = 80,
+                     bottom = 150,
+                     left = 60),
+        show_xlabs=T,
+        show_ylabs=T,
+        title='Motor Trend Car Road Tests',
+        subtitle='mtcars dataset')
+```
+
 ## Shiny
 There are several Shiny examples using all these plots in the example directory.
 

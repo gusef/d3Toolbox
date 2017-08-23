@@ -56,20 +56,18 @@ HTMLWidgets.widget({
 
         redraw: function(data, param, width, height) {
 
-    		//if there is a title add more margin
-    		if (param.title !== ''){
-    		    param.margins.top += 40;
-    		}
+    		var margin = param.margins;
+            var top = param.title !== '' ? 40 : 0 ;
 
-	    	var wid = width - param.margins.left - param.margins.right;
-		    var hei = height - param.margins.top - param.margins.bottom;
+	    	var wid = width - margin.left - margin.right;
+		    var hei = height - margin.top - margin.bottom - top;
 
             // title and subtitle
             if (param.title !== null){
                 svg.append("text")
                     .attr("text-anchor", "middle")
                     .attr("transform",
-                          "translate("+ (width/2) +","+((param.margins.top/3))+")")
+                          "translate("+ (width/2) +","+(((margin.top+top)/3))+")")
                     .attr("font-size", "24px")
                     .text(param.title);
             }
@@ -78,52 +76,66 @@ HTMLWidgets.widget({
                 svg.append("text")
                     .attr("text-anchor", "middle")
                     .attr("transform",
-                          "translate("+ (width/2) +","+((2*param.margins.top/3))+")")
+                          "translate("+ (width/2) +","+((2*(margin.top+top)/3))+")")
                     .attr("font-size", "15px")
                     .text(param.subtitle);
             }
 
-
       	    var g = svg.append("g")
 		    	       .attr("transform",
-		    	             "translate(" + param.margins.left + "," + param.margins.top + ")");
+		    	             "translate(" + margin.left + "," + (margin.top + top) + ")");
 
-            var x = d3.scaleBand()
+            var xlab = d3.scaleBand()
+                      .domain(param.xax)
                       .rangeRound([0, wid]);
 
             //show the labels on the bottom
             if (param.show_xax){
-                x.domain(param.xax);
                 var xlabels = g.selectAll(".xlab")
                   .data(param.xax)
                   .enter().append("text")
-                   .attr("class", "xlab")
+                   .attr("class", "xlab selectlabel")
                    .text(function (d) { return d; })
-                   .attr("x", function(d) { return x(d) + 0.7 * x.bandwidth(); })
-                   .attr("y", hei + 5)
-                   .attr("transform", function(d) { return "rotate(270," + (x(d)  + 0.7 * x.bandwidth()) + "," + (hei + 5) + ")"; })
-                   .style("text-anchor", "end");
+                   .attr("x", function(d) { return xlab(d) + 0.7 * xlab.bandwidth(); })
+                   .attr("y", hei + 3)
+                   .attr("transform", function(d) { return "rotate(270," + (xlab(d)  + 0.7 * xlab.bandwidth()) + "," + (hei + 3) + ")"; })
+                   .style("text-anchor", "end")
+                   .on("click", click("xlab"));
             }
 
-            var y = d3.scaleBand()
+            var ylab = d3.scaleBand()
+                      .domain(param.yax)
                       .rangeRound([0, hei]);
 
             //show the labels on the right
             if (param.show_yax){
-                y.domain(param.yax);
                 var ylabels = g.selectAll(".ylab")
                   .data(param.yax)
                   .enter().append("text")
-                   .attr("class", "ylab")
+                   .attr("class", "ylab selectlabel")
                    .text(function (d) { return d; })
-                   .attr("x", wid)
-                   .attr("y", function(d) { return y(d)  + 0.6 * y.bandwidth(); })
-                   .style("text-anchor", "start");
+                   .attr("x", wid + 3)
+                   .attr("y", function(d) { return ylab(d)  + 0.6 * ylab.bandwidth(); })
+                   .style("text-anchor", "start")
+                   .on("click", click("ylab"));
             }
 
-            // resetting the scales
-            x.domain(d3.range(data[0].length));
-            y.domain(d3.range(data.length));
+            // clicking a label
+            function click(click_type) {
+                return function(d) {
+                    Shiny.onInputChange(param.callback,{"type" : click_type,
+                                                        "value" : d});
+                };
+            }
+
+            //setting the scales for the actual data
+            var x = d3.scaleBand()
+                      .domain(d3.range(data[0].length))
+                      .rangeRound([0, wid]);
+
+            var y = d3.scaleBand()
+                      .domain(d3.range(data.length))
+                      .rangeRound([hei, 0]);
 
             // add a color scale
             var ext = d3.extent(data);
@@ -131,11 +143,31 @@ HTMLWidgets.widget({
                 .domain([d3.min(ext[0]),d3.max(ext[1])])
                 .range(param.colors);
 
+           //add tooltip
+            var tiphtml = function(d, i) {
+                var col = param.xax[d3.select(this).attr("column")];
+                var row = param.yax.slice();
+                row = row.reverse()[d3.select(d3.select(this).node().parentNode).attr("row")];
+                var ret = "<strong>Value:</strong> <span style='color:red; float:right'>" + Math.round(d * 100) / 100 + "</span><br/>";
+                ret += "<strong>x-label:</strong> <span style='color:white; float:right'>" + col + "</span><br/>";
+                ret += "<strong>y-label:</strong> <span style='color:white; float:right'>" + row + "</span><br/>";
+
+                return ret;
+            };
+
+            //add tooltip to svg
+            var tool_tip = d3.tip()
+    	                     .attr('class', 'd3-tip')
+			                 .offset([-10, 0])
+			                 .html(tiphtml);
+            svg.call(tool_tip);
+
             //generate the matrix
             var row = g.selectAll(".row")
                        .data(data);
             var rowenter = row.enter().append("g")
                               .attr("class", "row")
+                              .attr("row", function(d, i) { return i; } )
                               .attr("transform", function(d, i) { return "translate(0," + y(i) + ")"; });
 
             var cell = row.merge(rowenter)
@@ -144,9 +176,13 @@ HTMLWidgets.widget({
                           .enter().append("rect")
                           .attr("class", "cell")
                           .attr("x", function(d, i) { return x(i); })
+                          .attr("column", function(d, i) { return i; } )
                           .attr("width", x.bandwidth())
                           .attr("height", y.bandwidth())
-                          .style("fill", function(d){ return color(d); });
+                          .style("fill", function(d){ return color(d); })
+        			      .on('mouseover', tool_tip.show)
+                          .on('mouseout',  tool_tip.hide);
+
         }
     };
   }
