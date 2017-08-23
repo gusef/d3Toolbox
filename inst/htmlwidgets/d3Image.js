@@ -64,17 +64,7 @@ HTMLWidgets.widget({
 	    	var wid = width - param.margins.left - param.margins.right;
 		    var hei = height - param.margins.top - param.margins.bottom;
 
-            // scales
-        	var y = d3.scaleOrdinal()
-                      .domain([0, data[0].length - 1])
-        	          .range([hei, 0]);
-
-        	//add color scale
-      	    var col = d3.scaleOrdinal()
-      	              .domain(d3.extent([].concat.apply([], data)))
-        	          .range(param.colors);
-
-             // title and subtitle
+            // title and subtitle
             if (param.title !== null){
                 svg.append("text")
                     .attr("text-anchor", "middle")
@@ -98,40 +88,65 @@ HTMLWidgets.widget({
 		    	       .attr("transform",
 		    	             "translate(" + param.margins.left + "," + param.margins.top + ")");
 
+            var x = d3.scaleBand()
+                      .rangeRound([0, wid]);
+
             //show the labels on the bottom
             if (param.show_xax){
-                var x = d3.scaleBand()
-                          .domain(param.xax)
-                          .rangeRound([0, wid]);
+                x.domain(param.xax);
                 var xlabels = g.selectAll(".xlab")
                   .data(param.xax)
                   .enter().append("text")
                    .attr("class", "xlab")
                    .text(function (d) { return d; })
-                   .attr("x", function(d) { return x(d); })
-                   .attr("y", hei)
-                   .attr("transform", function(d) { return "rotate(270," + x(d) + "," + hei + ")"; })
+                   .attr("x", function(d) { return x(d) + 0.7 * x.bandwidth(); })
+                   .attr("y", hei + 5)
+                   .attr("transform", function(d) { return "rotate(270," + (x(d)  + 0.7 * x.bandwidth()) + "," + (hei + 5) + ")"; })
                    .style("text-anchor", "end");
             }
 
+            var y = d3.scaleBand()
+                      .rangeRound([0, hei]);
+
             //show the labels on the right
             if (param.show_yax){
-                var y = d3.scaleBand()
-                          .domain(param.yax)
-                          .rangeRound([0, hei]);
+                y.domain(param.yax);
                 var ylabels = g.selectAll(".ylab")
                   .data(param.yax)
                   .enter().append("text")
                    .attr("class", "ylab")
                    .text(function (d) { return d; })
                    .attr("x", wid)
-                   .attr("y", function(d) { return y(d); })
+                   .attr("y", function(d) { return y(d)  + 0.6 * y.bandwidth(); })
                    .style("text-anchor", "start");
             }
 
+            // resetting the scales
+            x.domain(d3.range(data[0].length));
+            y.domain(d3.range(data.length));
 
-            d3data = HTMLWidgets.dataframeToD3(data);
+            // add a color scale
+            var ext = d3.extent(data);
+            var color = d3.scaleOrdinal()
+                .domain([d3.min(ext[0]),d3.max(ext[1])])
+                .range(param.colors);
 
+            //generate the matrix
+            var row = g.selectAll(".row")
+                       .data(data);
+            var rowenter = row.enter().append("g")
+                              .attr("class", "row")
+                              .attr("transform", function(d, i) { return "translate(0," + y(i) + ")"; });
+
+            var cell = row.merge(rowenter)
+                          .selectAll(".cell")
+                          .data(function(d) { return d; })
+                          .enter().append("rect")
+                          .attr("class", "cell")
+                          .attr("x", function(d, i) { return x(i); })
+                          .attr("width", x.bandwidth())
+                          .attr("height", y.bandwidth())
+                          .style("fill", function(d){ return color(d); });
         }
     };
   }
