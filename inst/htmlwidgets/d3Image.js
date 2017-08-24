@@ -101,7 +101,9 @@ HTMLWidgets.widget({
                    .attr("y", hei + 3)
                    .attr("transform", function(d) { return "rotate(270," + (xlab(d)  + 0.7 * xlab.bandwidth()) + "," + (hei + 3) + ")"; })
                    .style("text-anchor", "end")
-                   .on("click", click("xlab"));
+                   .on("click", click("xlab"))
+                   .on("mouseover", mouseov(true))
+                   .on("mouseout", mouseov(false));
             }
 
             var ylab = d3.scaleBand()
@@ -118,7 +120,16 @@ HTMLWidgets.widget({
                    .attr("x", wid + 3)
                    .attr("y", function(d) { return ylab(d)  + 0.6 * ylab.bandwidth(); })
                    .style("text-anchor", "start")
-                   .on("click", click("ylab"));
+                   .on("click", click("ylab"))
+                   .on("mouseover", mouseov(true))
+                   .on("mouseout", mouseov(false));
+            }
+
+            // highlighting with mouseover
+            function mouseov(active) {
+                return function(d) {
+                    d3.select(this).classed("label--active", active);
+                };
             }
 
             // clicking a label
@@ -146,7 +157,7 @@ HTMLWidgets.widget({
                 var value = raw_values[row][col];
                 var ret = "<strong>Value:</strong> <span style='color:red; float:right'>" + Math.round(value * 100) / 100 + "</span><br/>";
                 ret += "<strong>x-label:</strong> <span style='color:white; float:right'>" + param.xax[col] + "</span><br/>";
-                ret += "<strong>y-label:</strong> <span style='color:white; float:right'>" + y_rev.reverse()[row] + "</span><br/>";
+                ret += "<strong>y-label:</strong> <span style='color:white; float:right'>" + y_rev[row] + "</span><br/>";
                 return ret;
             };
 
@@ -165,6 +176,19 @@ HTMLWidgets.widget({
                               .attr("row", function(d, i) { return i; } )
                               .attr("transform", function(d, i) { return "translate(0," + y(i) + ")"; });
 
+            // clicking a cell
+            function click_cell() {
+                return function(d) {
+
+                    var col = d3.select(this).attr("column");
+                    var y_rev = param.yax.slice();
+                    row = d3.select(d3.select(this).node().parentNode).attr("row");
+                    Shiny.onInputChange(param.callback,{"type" : "cell",
+                                                        "value.x" : param.xax[col],
+                                                        "value.y" : y_rev[row] });
+                };
+            }
+
             var cell = row.merge(rowenter)
                           .selectAll(".cell")
                           .data(function(d) { return d; })
@@ -176,7 +200,8 @@ HTMLWidgets.widget({
                           .attr("height", y.bandwidth())
                           .style("fill", function(d){ return d; })
         			      .on('mouseover', tool_tip.show)
-                          .on('mouseout',  tool_tip.hide);
+                          .on('mouseout',  tool_tip.hide)
+                          .on("click", click_cell());
 
         }
     };

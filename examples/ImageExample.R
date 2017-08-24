@@ -8,7 +8,7 @@ ui <- fillPage(fillRow(
     d3ImageOutput("tSNE_panel", width = "100%", height = "100%"),
   fillCol(
     h3(verbatimTextOutput("currentOutput")),
-    d3BarplotOutput("filterpanel", width = "100%", height = "100%"),
+    d3ImageOutput("filterpanel", width = "100%", height = "100%"),
     d3ScatterOutput("lowdimpanel", width = "100%", height = "100%")
   ),flex = c(2,1))
   ,tags$head(tags$script(src="D3Image.js"))
@@ -37,19 +37,13 @@ server <- function(input, output, session) {
                   callback_handler='ScatterSelection')
     })
 
-    output$filterpanel <- renderd3Barplot({
-        data <- data.frame(x=(1:15),
-                           y=(1:15)/2,
-                           z=15:1)
-        rownames(data) <- c(LETTERS[1:15])
+    output$filterpanel <- renderd3Image({
+        mat <- matrix(rainbow(20),nrow=2)
 
-        d3Barplot(data,
-                  col=c('steelblue','grey','#de2d26'),
-                  tooltip=c(paste0('letter_',LETTERS[1:15])),
-                  xlab='Letters',
-                  ylab='Frequencies',
-                  title='New Barplot',
-                  subtitle='with subtitle')
+        d3Image(mat,
+                raw_values=NULL,
+                show_xlabs = F,
+                show_ylabs = F)
     })
 
     output$tSNE_panel <- renderd3Image({

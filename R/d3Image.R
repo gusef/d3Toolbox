@@ -25,26 +25,43 @@ d3Image <- function(mat, xlab = '', ylab = '', raw_values = NULL,
         if (!all(dim(raw_values) == dim(mat))){
             stop("The raw_values matrix needs to have the same dimensions as the matrix")
         }
-    }else{
-        raw_values <- mat
     }
 
     if (!allow_NA && sum(is.na(mat)) >0){
         stop('NA values detected, please set allow_NA=TRUE')
     }
 
-    #coloring
-    col_scale <- gplots::col2hex(col_scale)
+    if (class(as.vector(mat)) == 'numeric'){
+        col_scale <- gplots::col2hex(col_scale)
+        breaks <- seq(min(mat, na.rm = T),
+                      max(mat, na.rm = T),
+                      length = length(col_scale) + 1 )
 
+        grps <- cut(mat, breaks = breaks, include.lowest = TRUE)
+        col <- col_scale[grps]
+        col <- matrix(col, ncol=ncol(mat))
 
-    breaks <- seq(min(mat, na.rm = T),
-                  max(mat, na.rm = T),
-                  length = length(col_scale) + 1 )
+        #if we have a numeric matrix and no raw values specified use the matrix values
+        if (is.null(raw_values)){
+            raw_values <- mat
+        }
+    } else {
+        col <- matrix(gplots::col2hex(mat), ncol=ncol(mat))
+    }
 
-    grps <- cut(mat, breaks = breaks, include.lowest = TRUE)
-    col <- col_scale[grps]
-    col <- matrix(col, ncol=ncol(mat))
+    #specify x labels
+    if (is.null(colnames(mat))){
+        xax <- 1:ncol(mat)
+    } else {
+        xax <- colnames(mat)
+    }
 
+    #specify x labels
+    if (is.null(rownames(mat))){
+        yax <- 1:nrow(mat)
+    } else {
+        yax <- rownames(mat)
+    }
 
     # forward options using x
     x = list(
@@ -52,8 +69,8 @@ d3Image <- function(mat, xlab = '', ylab = '', raw_values = NULL,
         raw_values = raw_values,
         xlab = xlab,
         ylab = ylab,
-        xax = colnames(mat),
-        yax = rownames(mat),
+        xax = xax,
+        yax = yax,
         show_xax = show_xlabs,
         show_yax = show_ylabs,
         title = title,
