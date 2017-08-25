@@ -8,7 +8,7 @@
 d3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
                       dotsize =2, xlab='', ylab='', title=NULL, subtitle=NULL, margins = NULL,
                       callback_handler='BoxplotSelection', legend=NULL,
-                      width = NULL, height = NULL, elementId = NULL) {
+                      width = NULL, height = NULL, elementId = NULL, collection = FALSE) {
 
     if (is.null(margins)){
         margins <- list(top = 40,
@@ -69,6 +69,7 @@ d3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
 
     # forward options using x
     x = list(
+        type = "d3Boxplot",
         data = data_long,
         stats = stats,
         outliers = outliers_long,
@@ -86,16 +87,21 @@ d3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
         margins=margins,
         callback_handler = callback_handler
     )
-  # create widget
-  htmlwidgets::createWidget(
-    name = 'd3Boxplot',
-    x,
-    width = width,
-    height = height,
-    package = 'd3Toolbox',
-    elementId = elementId,
-    sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
-  )
+
+    if (collection){
+        return(x)
+    }else{
+        # create widget
+        htmlwidgets::createWidget(
+            name = 'd3Boxplot',
+            x,
+            width = width,
+            height = height,
+            package = 'd3Toolbox',
+            elementId = elementId,
+            sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
+        )
+    }
 }
 
 #' Shiny bindings for D3Boxplot

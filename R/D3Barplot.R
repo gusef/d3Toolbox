@@ -8,7 +8,8 @@
 d3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', padding=0.1,
                       show_axes = TRUE, title='', subtitle='',
                       callback_handler='BarSelection', yrange=NULL,
-                      margins = NULL, width = NULL, height = NULL, elementId = NULL) {
+                      margins = NULL, width = NULL, height = NULL,
+                      elementId = NULL, collection = FALSE) {
 
     if (is.null(margins)){
         margins <- list(top = 40,
@@ -44,6 +45,7 @@ d3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', 
 
     # forward options using x
     x = list(
+        type = "d3Barplot",
         data = data,
         name = name,
         tooltip = tooltip,
@@ -61,16 +63,20 @@ d3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', 
         callback_handler = callback_handler
     )
 
-  # create widget
-  htmlwidgets::createWidget(
-    name = 'd3Barplot',
-    x,
-    width = width,
-    height = height,
-    package = 'd3Toolbox',
-    elementId = elementId,
-    sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
-  )
+    if (collection){
+        return(x)
+    }else{
+        # create widget
+        htmlwidgets::createWidget(
+            name = 'd3Barplot',
+            x,
+            width = width,
+            height = height,
+            package = 'd3Toolbox',
+            elementId = elementId,
+            sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
+         )
+    }
 }
 
 #' Shiny bindings for D3Barplot

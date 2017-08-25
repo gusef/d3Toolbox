@@ -10,7 +10,7 @@ d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
                       tooltip=NULL, legend=NULL ,width = NULL, height = NULL,
                       xrange=NULL, yrange=NULL, margins = NULL,
                       col_scale = RColorBrewer::brewer.pal(11,"RdBu")[11:1],
-                      elementId = NULL) {
+                      elementId = NULL, collection = FALSE) {
 
     if (is.null(margins)){
         margins <- list(top = 40,
@@ -63,6 +63,7 @@ d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
 
     # forward options using x
     x = list(
+        type = "d3Scatter",
         data = data,
         dotsize = dotsize,
         xlab = xlab,
@@ -77,16 +78,21 @@ d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
         callback_handler = callback_handler
     )
 
-    # create widget
-    htmlwidgets::createWidget(
-        name = 'd3Scatter',
-        x,
-        width = width,
-        height = height,
-        package = 'd3Toolbox',
-        elementId = elementId,
-        sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
-    )
+    if (collection){
+        return(x)
+    }else{
+        # create widget
+        htmlwidgets::createWidget(
+            name = 'd3Scatter',
+            x,
+            width = width,
+            height = height,
+            package = 'd3Toolbox',
+            elementId = elementId,
+            sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
+        )
+    }
+
 }
 
 #' Shiny bindings for d3Scatter

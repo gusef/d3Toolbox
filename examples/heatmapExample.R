@@ -19,7 +19,6 @@ ui <- fillPage(
             flex = c(3,10)
         ),
         flex = c(3,1,10))
-        ,tags$head(tags$script(src="D3Image.js"))
 )
 
 server <- function(input, output, session) {
@@ -79,8 +78,9 @@ server <- function(input, output, session) {
     output$colColbar <- renderd3Image({
         topbar <- rbind(c('#2ca25f','#f03b20','#99d8c9','#ffeda0')[as.numeric(eSet$BORI)],
                          c('#f03b20','#99d8c9','#ffeda0')[as.numeric(eSet$RESW13I)])
-        topbar <- topbar[,colInd]
+        colnames(topbar) <- colnames(eSet)
         rownames(topbar) <- c('BORI','RESW13I')
+        topbar <- topbar[,colInd]
         d3Image(topbar,
                 raw_values=NULL,
                 show_xlabs = F,
@@ -110,7 +110,7 @@ server <- function(input, output, session) {
         sx <- apply(x, 1, sd, na.rm = F)
         x <- sweep(x, 1, sx, "/")
 
-        d3Image(mat=x,
+        d3Image(data=x,
                 raw_values=dat,
                 xlab='Samples',
                 ylab='genes',

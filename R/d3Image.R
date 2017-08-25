@@ -5,14 +5,14 @@
 #' @import htmlwidgets
 #'
 #' @export
-d3Image <- function(mat, xlab = '', ylab = '', raw_values = NULL,
-                    show_xlabs = !is.null(colnames(mat)),
-                    show_ylabs = !is.null(rownames(mat)),
+d3Image <- function(data, xlab = '', ylab = '', raw_values = NULL,
+                    show_xlabs = !is.null(colnames(data)),
+                    show_ylabs = !is.null(rownames(data)),
                     allow_NA = FALSE,
                     title = NULL, subtitle = NULL, callback_handler='ImageSelection',
                     width = NULL, height = NULL, margins = NULL,
                     col_scale = RColorBrewer::brewer.pal(11,"RdBu")[11:1],
-                    elementId = NULL) {
+                    elementId = NULL, collection = FALSE) {
 
     if (is.null(margins)){
         margins <- list(top = 40,
@@ -22,49 +22,50 @@ d3Image <- function(mat, xlab = '', ylab = '', raw_values = NULL,
     }
 
     if (!is.null(raw_values)){
-        if (!all(dim(raw_values) == dim(mat))){
+        if (!all(dim(raw_values) == dim(data))){
             stop("The raw_values matrix needs to have the same dimensions as the matrix")
         }
     }
 
-    if (!allow_NA && sum(is.na(mat)) >0){
+    if (!allow_NA && sum(is.na(data)) >0){
         stop('NA values detected, please set allow_NA=TRUE')
     }
 
-    if (class(as.vector(mat)) == 'numeric'){
+    if (class(as.vector(data)) == 'numeric'){
         col_scale <- gplots::col2hex(col_scale)
-        breaks <- seq(min(mat, na.rm = T),
-                      max(mat, na.rm = T),
+        breaks <- seq(min(data, na.rm = T),
+                      max(data, na.rm = T),
                       length = length(col_scale) + 1 )
 
-        grps <- cut(mat, breaks = breaks, include.lowest = TRUE)
+        grps <- cut(data, breaks = breaks, include.lowest = TRUE)
         col <- col_scale[grps]
-        col <- matrix(col, ncol=ncol(mat))
+        col <- matrix(col, ncol=ncol(data))
 
         #if we have a numeric matrix and no raw values specified use the matrix values
         if (is.null(raw_values)){
-            raw_values <- mat
+            raw_values <- data
         }
     } else {
-        col <- matrix(gplots::col2hex(mat), ncol=ncol(mat))
+        col <- matrix(gplots::col2hex(data), ncol=ncol(data))
     }
 
     #specify x labels
-    if (is.null(colnames(mat))){
-        xax <- 1:ncol(mat)
+    if (is.null(colnames(data))){
+        xax <- 1:ncol(data)
     } else {
-        xax <- colnames(mat)
+        xax <- colnames(data)
     }
 
     #specify x labels
-    if (is.null(rownames(mat))){
-        yax <- 1:nrow(mat)
+    if (is.null(rownames(data))){
+        yax <- 1:nrow(data)
     } else {
-        yax <- rownames(mat)
+        yax <- rownames(data)
     }
 
     # forward options using x
     x = list(
+        type = "d3Image",
         data = col,
         raw_values = raw_values,
         xlab = xlab,
@@ -79,16 +80,20 @@ d3Image <- function(mat, xlab = '', ylab = '', raw_values = NULL,
         callback_handler = callback_handler
     )
 
-    # create widget
-    htmlwidgets::createWidget(
-        name = 'd3Image',
-        x,
-        width = width,
-        height = height,
-        package = 'd3Toolbox',
-        elementId = elementId,
-        sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
-    )
+    if (collection){
+        return(x)
+    }else{
+        # create widget
+        htmlwidgets::createWidget(
+            name = 'd3Image',
+            x,
+            width = width,
+            height = height,
+            package = 'd3Toolbox',
+            elementId = elementId,
+            sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
+        )
+    }
 }
 
 #' Shiny bindings for d3Image

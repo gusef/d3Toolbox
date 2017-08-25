@@ -3,8 +3,12 @@ dependencies:
   version: 4.10.0
   src: htmlwidgets/lib
   script: ./d3.min.js
-  stylesheet: d3Toolbox.css
 - name: d3-tip
   version: 0.0.0
   src: htmlwidgets/lib
   script: d3-tip.js
+- name: d3-toolbox
+  version: 0.0.0
+  src: htmlwidgets/lib
+  script: d3-toolbox.js
+  stylesheet: d3Toolbox.css

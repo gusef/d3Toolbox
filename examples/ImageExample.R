@@ -53,7 +53,7 @@ server <- function(input, output, session) {
         sx <- apply(x, 1, sd, na.rm = F)
         x <- sweep(x, 1, sx, "/")
 
-        d3Image(mat=x,
+        d3Image(data=x,
                 raw_values=t(mtcars),
                 xlab='Cars',
                 ylab='Features',

@@ -5,10 +5,10 @@
 #' @import htmlwidgets
 #'
 #' @export
-d3Dendrogram <- function(dend, horiz = FALSE, label = TRUE, classic_tree = TRUE,
+d3Dendrogram <- function(data, horiz = FALSE, label = TRUE, classic_tree = TRUE,
                          lab_adj = 120, title=NULL, subtitle=NULL, axis=TRUE,
                          margins = NULL, callback_handler="DendSelection",
-                         width = NULL, height = NULL, elementId = NULL) {
+                         width = NULL, height = NULL, elementId = NULL, collection = FALSE) {
 
     if (is.null(margins)){
         margins <- list(top = 40,
@@ -17,14 +17,15 @@ d3Dendrogram <- function(dend, horiz = FALSE, label = TRUE, classic_tree = TRUE,
                         left = 60)
     }
 
-    if (class(dend) != 'dendrogram'){
+    if (class(data) != 'dendrogram'){
         stop('Object dend needs to be a dendrogram')
     }
 
-    tree <- getDendTree(dend)
+    tree <- getDendTree(data)
 
     # forward options using x
     x = list(
+        type = "d3Dendrogram",
         tree = tree,
         horiz = horiz,
         label = label,
@@ -37,16 +38,20 @@ d3Dendrogram <- function(dend, horiz = FALSE, label = TRUE, classic_tree = TRUE,
         callback_handler = callback_handler
     )
 
-  # create widget
-  htmlwidgets::createWidget(
-    name = 'd3Dendrogram',
-    x,
-    width = width,
-    height = height,
-    package = 'd3Toolbox',
-    elementId = elementId,
-    sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
-  )
+    if (collection){
+        return(x)
+    }else{
+        # create widget
+        htmlwidgets::createWidget(
+            name = 'd3Dendrogram',
+            x,
+            width = width,
+            height = height,
+            package = 'd3Toolbox',
+            elementId = elementId,
+            sizingPolicy = htmlwidgets::sizingPolicy(browser.fill = TRUE)
+        )
+    }
 }
 
 getDendTree <- function(dend){
