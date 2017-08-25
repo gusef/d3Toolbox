@@ -11,9 +11,21 @@ HTMLWidgets.widget({
                  .attr("height",height);
     var data = null;
     var param = null;
+    var wid = null;
+    var hei = null;
 
     return{
         renderValue: function(x) {
+            el.innerHTML = '';
+
+            //figuring out width and height in a way that redrawing works
+            wid = wid === null ? width : wid;
+            hei = hei === null ? height : hei;
+
+            svg  = d3.select(el).append("svg")
+                     .attr("width", wid)
+                     .attr("height", hei);
+
            	this.data = x.data;
            	this.param = {"tooltip" : x.tooltip !== '',
            	              "singleVar" : Object.keys(this.data).length == 1,
@@ -21,6 +33,7 @@ HTMLWidgets.widget({
            	              "unit" : x.unit,
            	              "xlab" : x.xlab,
                           "ylab" : x.ylab,
+                          "show_axes" : x.show_axes,
                           "yrange" : x.yrange,
                           "padding" : x.padding,
            	              "title" : x.title,
@@ -37,22 +50,22 @@ HTMLWidgets.widget({
            	if (this.param.tooltip){
            	    this.data.tooltip = x.tooltip;
            	}
-           	this.redraw(this.data, this.param, width, height);
+           	this.redraw(this.data, this.param, wid, hei);
         },
         resize: function(width, height) {
-	        d3.select(el).select("svg")
-	            .attr("width", width)
-	            .attr("height", height);
-	        d3.select(el).select("svg").selectAll("g").remove();
-	        d3.select(el).select("svg").selectAll("text").remove();
-	        d3.select(el).selectAll("d3-tip").remove();
-	        this.redraw(this.data, this.param, width, height);
+            el.innerHTML = '';
+            wid = width;
+            hei = height;
+            svg  = d3.select(el).append("svg")
+    	             .attr("width", wid)
+    	             .attr("height", hei);
+	        this.redraw(this.data, this.param, wid, hei);
         },
 
         redraw: function(data, param, width, height) {
 
     		var margin = param.margins;
-            var top = param.title !== '' ? 40 : 0 ;
+            var top = param.title !== null ? 40 : 0 ;
 
 	    	var wid = width - margin.left - margin.right;
 		    var hei = height - margin.top - margin.bottom - top;
@@ -75,14 +88,16 @@ HTMLWidgets.widget({
             }
 
             // add the x and y axes
-	     	g.append("g")
-	 		      .attr("class", "axis axis--x")
-			      .attr("transform", "translate(0," + hei + ")")
-		    	  .call(d3.axisBottom(x));
+            if (param.show_axes){
+    	     	g.append("g")
+    	 		      .attr("class", "axis axis--x")
+    			      .attr("transform", "translate(0," + hei + ")")
+    		    	  .call(d3.axisBottom(x));
 
-			g.append("g")
-			      .attr("class", "axis axis--y")
-			      .call(d3.axisLeft(y).ticks(10, param.unit));
+    			g.append("g")
+    			      .attr("class", "axis axis--y")
+    			      .call(d3.axisLeft(y).ticks(10, param.unit));
+            }
 
            // now add titles to the axes
             svg.append("text")

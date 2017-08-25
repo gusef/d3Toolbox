@@ -42,23 +42,20 @@ HTMLWidgets.widget({
         },
 
         resize: function(width, height) {
-
+            el.innerHTML = '';
             wid = width;
             hei = height;
             d3.select(el).select("svg")
-	            .attr("width", width)
-	            .attr("height", height);
-	        d3.select(el).select("svg").selectAll("g").remove();
-	        d3.select(el).select("svg").selectAll("text").remove();
-	        d3.select(el).selectAll("d3-tip").remove();
-	        this.redraw(this.data, this.param, width, height);
+	            .attr("width", wid)
+	            .attr("height", hei);
+	        this.redraw(this.data, this.param, wid, hei);
         },
 
         redraw: function(data, param, width, height) {
             d3data = HTMLWidgets.dataframeToD3(data);
 
     		var margin = param.margins;
-            var top = param.title !== '' ? 40 : 0 ;
+            var top = param.title !== null ? 40 : 0 ;
 
 	    	var wid = width - margin.left - margin.right;
 		    var hei = height - margin.top - margin.bottom - top;

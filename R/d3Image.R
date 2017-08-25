@@ -9,7 +9,7 @@ d3Image <- function(mat, xlab = '', ylab = '', raw_values = NULL,
                     show_xlabs = !is.null(colnames(mat)),
                     show_ylabs = !is.null(rownames(mat)),
                     allow_NA = FALSE,
-                    title=NULL, subtitle=NULL, callback_handler='ImageSelection',
+                    title = NULL, subtitle = NULL, callback_handler='ImageSelection',
                     width = NULL, height = NULL, margins = NULL,
                     col_scale = RColorBrewer::brewer.pal(11,"RdBu")[11:1],
                     elementId = NULL) {

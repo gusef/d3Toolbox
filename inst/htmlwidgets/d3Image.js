@@ -43,22 +43,19 @@ HTMLWidgets.widget({
         },
 
         resize: function(width, height) {
-
+            el.innerHTML = '';
             wid = width;
             hei = height;
-            d3.select(el).select("svg")
-	            .attr("width", width)
-	            .attr("height", height);
-	        d3.select(el).select("svg").selectAll("g").remove();
-	        d3.select(el).select("svg").selectAll("text").remove();
-	        d3.select(el).selectAll("d3-tip").remove();
-	        this.redraw(this.data, this.raw_values, this.param, width, height);
+            svg  = d3.select(el).append("svg")
+    	             .attr("width", wid)
+    	             .attr("height", hei);
+	        this.redraw(this.data, this.raw_values, this.param, wid, hei);
         },
 
         redraw: function(data, raw_values, param, width, height) {
 
     		var margin = param.margins;
-            var top = param.title !== '' ? 40 : 0 ;
+            var top = param.title !== null ? 40 : 0 ;
 
 	    	var wid = width - margin.left - margin.right;
 		    var hei = height - margin.top - margin.bottom - top;
@@ -88,7 +85,7 @@ HTMLWidgets.widget({
 
             var xlab = d3.scaleBand()
                          .domain(param.xax)
-                         .rangeRound([0, wid]);
+                         .range([0, wid]);
 
             //show the labels on the bottom
             if (param.show_xax){
@@ -97,7 +94,7 @@ HTMLWidgets.widget({
                   .enter().append("text")
                    .attr("class", "xlab selectlabel")
                    .text(function (d) { return d; })
-                   .attr("x", function(d) { return xlab(d) + 0.7 * xlab.bandwidth(); })
+                   .attr("x", function(d) { return xlab(d) + 0.8 * xlab.bandwidth(); })
                    .attr("y", hei + 3)
                    .attr("transform", function(d) { return "rotate(270," + (xlab(d)  + 0.7 * xlab.bandwidth()) + "," + (hei + 3) + ")"; })
                    .style("text-anchor", "end")
@@ -108,7 +105,7 @@ HTMLWidgets.widget({
 
             var ylab = d3.scaleBand()
                       .domain(param.yax)
-                      .rangeRound([hei, 0]);
+                      .range([hei, 0]);
 
             //show the labels on the right
             if (param.show_yax){
@@ -118,7 +115,7 @@ HTMLWidgets.widget({
                    .attr("class", "ylab selectlabel")
                    .text(function (d) { return d; })
                    .attr("x", wid + 3)
-                   .attr("y", function(d) { return ylab(d)  + 0.6 * ylab.bandwidth(); })
+                   .attr("y", function(d) { return ylab(d)  + 0.7 * ylab.bandwidth(); })
                    .style("text-anchor", "start")
                    .on("click", click("ylab"))
                    .on("mouseover", mouseov(true))
@@ -143,21 +140,28 @@ HTMLWidgets.widget({
             //setting the scales for the actual data
             var x = d3.scaleBand()
                       .domain(d3.range(data[0].length))
-                      .rangeRound([0, wid]);
+                      .range([0, wid]);
 
             var y = d3.scaleBand()
                       .domain(d3.range(data.length))
-                      .rangeRound([hei, 0]);
+                      .range([hei, 0]);
 
            //add tooltip
             var tiphtml = function(d, i) {
                 var col = d3.select(this).attr("column");
-                var y_rev = param.yax.slice();
                 row = d3.select(d3.select(this).node().parentNode).attr("row");
-                var value = raw_values[row][col];
-                var ret = "<strong>Value:</strong> <span style='color:red; float:right'>" + Math.round(value * 100) / 100 + "</span><br/>";
-                ret += "<strong>x-label:</strong> <span style='color:white; float:right'>" + param.xax[col] + "</span><br/>";
-                ret += "<strong>y-label:</strong> <span style='color:white; float:right'>" + y_rev[row] + "</span><br/>";
+                var ret = "";
+
+                if (raw_values !== null){
+                    var value = raw_values[row][col];
+                    ret += "<strong>Value:</strong> <span style='color:red; float:right'>" + Math.round(value * 100) / 100 + "</span><br/>";
+                }
+                if (param.show_xax){
+                    ret += "<strong>x-label:</strong> <span style='color:white; float:right'>" + param.xax[col] + "</span><br/>";
+                }
+                if (param.show_yax){
+                    ret += "<strong>y-label:</strong> <span style='color:white; float:right'>" + param.yax[row] + "</span><br/>";
+                }
                 return ret;
             };
 
@@ -199,10 +203,12 @@ HTMLWidgets.widget({
                           .attr("width", x.bandwidth())
                           .attr("height", y.bandwidth())
                           .style("fill", function(d){ return d; })
-        			      .on('mouseover', tool_tip.show)
-                          .on('mouseout',  tool_tip.hide)
                           .on("click", click_cell());
 
+            if (raw_values !== null || param.show_xax || param.show_yax){
+                cell.on('mouseover', tool_tip.show)
+                    .on('mouseout',  tool_tip.hide);
+            }
         }
     };
   }

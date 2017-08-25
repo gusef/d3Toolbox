@@ -46,15 +46,15 @@ HTMLWidgets.widget({
             wid = width;
             hei = height;
             svg  = d3.select(el).append("svg")
-    	             .attr("width", width)
-    	             .attr("height", height);
+    	             .attr("width", wid)
+    	             .attr("height", hei);
 	        this.redraw(this.tree, this.param, wid, hei);
         },
 
         redraw: function(tree, param, width, height) {
 
     		var margin = param.margins;
-            var top = param.title !== '' ? 40 : 0 ;
+            var top = param.title !== null ? 40 : 0 ;
 
 	    	var wid = width - margin.left - margin.right;
 		    var hei = height - margin.top - margin.bottom - top;

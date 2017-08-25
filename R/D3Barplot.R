@@ -6,7 +6,8 @@
 #'
 #' @export
 d3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', padding=0.1,
-                      title='', subtitle='', callback_handler='BarSelection', yrange=NULL,
+                      show_axes = TRUE, title='', subtitle='',
+                      callback_handler='BarSelection', yrange=NULL,
                       margins = NULL, width = NULL, height = NULL, elementId = NULL) {
 
     if (is.null(margins)){
@@ -50,6 +51,7 @@ d3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', 
         unit = unit,
         xlab = xlab,
         ylab = ylab,
+        show_axes = show_axes,
         yrange = yrange,
         padding = padding,
         title = title,

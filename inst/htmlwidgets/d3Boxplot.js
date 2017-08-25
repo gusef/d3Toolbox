@@ -11,6 +11,8 @@ HTMLWidgets.widget({
         var outliers = null;
         var param = null;
         var stats = null;
+        var wid = null;
+        var hei = null;
 
     return {
 
@@ -47,20 +49,19 @@ HTMLWidgets.widget({
         },
 
         resize: function(width, height) {
-            d3.select(el).select("svg")
-	            .attr("width", width)
-	            .attr("height", height);
-	        d3.select(el).select("svg").selectAll("g").remove();
-	        d3.select(el).select("svg").selectAll("text").remove();
-	        d3.select(el).selectAll("d3-tip").remove();
-	        this.redraw(this.data, this.param, this.stats, this.outliers, width, height);
-
+            el.innerHTML = '';
+            wid = width;
+            hei = height;
+            svg  = d3.select(el).append("svg")
+    	             .attr("width", wid)
+    	             .attr("height", hei);
+            this.redraw(this.data, this.param, this.stats, this.outliers, wid, hei);
         },
 
         redraw: function(data, param, stats, outlier, width, height) {
 
     		var margin = param.margins;
-            var top = param.title !== '' ? 40 : 0 ;
+            var top = param.title !== null ? 40 : 0 ;
 
 	    	var wid = width - margin.left - margin.right;
 		    var hei = height - margin.top - margin.bottom - top;

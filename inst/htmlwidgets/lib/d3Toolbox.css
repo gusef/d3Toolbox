@@ -76,9 +76,6 @@
 }
 
 .bar {
-  stroke: #000;
-  stroke-width: 1;
-  shape-rendering: "crispEdges";
 }
 .bar:hover {
   fill: lightgrey;
