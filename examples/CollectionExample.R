@@ -10,15 +10,19 @@ ui <- fillPage(fillRow(
     d3ScatterOutput("lowdimpanel", width = "100%", height = "100%")
   ),flex = c(2,1))
   ,tags$head(tags$script(src="d3Collection.js"))
+  ,tags$head(tags$script(src="d3-toolbox.js"))
 )
 
 
 readeSet <- function(){
-    eSet <- readRDS('/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/RNAseq_nodedup_cpm.RDS')
+    #dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
+    dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'
+    
+    eSet <- readRDS(paste0(dir,'RNAseq_nodedup_cpm.RDS'))
     eSet <- eSet[,eSet$Visit.Code == "SCREEN"]
 
     #fix genes
-    genes <- as.character(read.csv('/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/genes.txt')[,1])
+    genes <- as.character(read.csv(paste0(dir,'genes.txt'))[,1])
     eSet <- eSet[rowSums(exprs(eSet)) >0, ]
     exprs(eSet) <- log2(exprs(eSet) + 1)
     eSet <- eSet[fData(eSet)$hgnc_symbol %in% genes,]
@@ -62,7 +66,6 @@ readeSet <- function(){
                       data = top_dend,
                       label = F,
                       axis = F,
-                      title = "First prototype of a heatmap",
                       margins=list(top = 40,
                                    right = right_mar,
                                    bottom = 5,
@@ -163,7 +166,7 @@ server <- function(input, output, session) {
                   title='Iris dataset',
                   subtitle='subtitle',
                   tooltip = c('Species'),
-                  callback_handler='ScatterSelection')
+                  callback='ScatterSelection')
     })
 
     output$currentOutput <- renderPrint({ print(input$ScatterSelection) })

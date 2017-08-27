@@ -35,7 +35,7 @@ server <- function(input, output, session) {
                   subtitle='subtitle',
                   tooltip = c('Species','z'),
                   #legend = legend,
-                  callback_handler='ScatterSelection')
+                  callback='ScatterSelection')
     })
 
     output$filterpanel <- renderd3Barplot({
@@ -66,7 +66,7 @@ server <- function(input, output, session) {
                   ylab='Sepal Width',
                   title='Iris dataset',
                   subtitle='subtitle',
-                  callback_handler='ScatterSelection')
+                  callback='ScatterSelection')
     })
 
     output$currentOutput <- renderPrint({ print(input$ScatterSelection) })

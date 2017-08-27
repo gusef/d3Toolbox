@@ -9,7 +9,6 @@ HTMLWidgets.widget({
     var svg  = d3.select(el).append("svg")
                  .attr("width",width)
                  .attr("height",height);
-    var data = null;
     var param = null;
     var wid = null;
     var hei = null;
@@ -26,31 +25,8 @@ HTMLWidgets.widget({
                      .attr("width", wid)
                      .attr("height", hei);
 
-           	this.data = x.data;
-           	this.param = {"tooltip" : x.tooltip !== '',
-           	              "singleVar" : Object.keys(this.data).length == 1,
-           	              "fill" : x.fill,
-           	              "unit" : x.unit,
-           	              "xlab" : x.xlab,
-                          "ylab" : x.ylab,
-                          "show_axes" : x.show_axes,
-                          "yrange" : x.yrange,
-                          "padding" : x.padding,
-           	              "title" : x.title,
-           	              "subtitle" : x.subtitle,
-                          "max_value" : x.max_value,
-                          "margins" : x.margins,
-           	              "callback" : x.callback_handler
-           	    };
-
-           	//add the row names
-           	this.data.name = x.name;
-
-           	//if there are tooltips add them
-           	if (this.param.tooltip){
-           	    this.data.tooltip = x.tooltip;
-           	}
-           	draw_barplot(svg, this.data, this.param, wid, hei);
+           	this.param = x;
+           	draw_d3Barplot(svg, this.param, wid, hei);
         },
         resize: function(width, height) {
             el.innerHTML = '';
@@ -59,7 +35,7 @@ HTMLWidgets.widget({
             svg  = d3.select(el).append("svg")
     	             .attr("width", wid)
     	             .attr("height", hei);
-	        draw_barplot(svg, this.data, this.param, wid, hei);
+	        draw_d3Barplot(svg, this.param, wid, hei);
         },
      };
    }

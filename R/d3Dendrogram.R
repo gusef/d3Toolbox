@@ -5,9 +5,9 @@
 #' @import htmlwidgets
 #'
 #' @export
-d3Dendrogram <- function(data, horiz = FALSE, label = TRUE, classic_tree = TRUE,
+d3Dendrogram <- function(data, horiz = FALSE, label = TRUE, classic = TRUE,
                          lab_adj = 120, title=NULL, subtitle=NULL, axis=TRUE,
-                         margins = NULL, callback_handler="DendSelection",
+                         margins = NULL, callback="DendSelection",
                          width = NULL, height = NULL, elementId = NULL, collection = FALSE) {
 
     if (is.null(margins)){
@@ -21,21 +21,21 @@ d3Dendrogram <- function(data, horiz = FALSE, label = TRUE, classic_tree = TRUE,
         stop('Object dend needs to be a dendrogram')
     }
 
-    tree <- getDendTree(data)
+    data <- getDendTree(data)
 
     # forward options using x
     x = list(
         type = "d3Dendrogram",
-        tree = tree,
+        data = data,
         horiz = horiz,
         label = label,
         lab_adj = lab_adj,
-        classic_tree = classic_tree,
+        classic = classic,
         axis = axis,
         title = title,
         subtitle = subtitle,
-        margins=margins,
-        callback_handler = callback_handler
+        margins = margins,
+        callback = callback
     )
 
     if (collection){

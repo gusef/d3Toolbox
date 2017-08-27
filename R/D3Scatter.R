@@ -6,7 +6,7 @@
 #'
 #' @export
 d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
-                      title=NULL, subtitle=NULL, callback_handler='ScatterSelection',
+                      title=NULL, subtitle=NULL, callback='ScatterSelection',
                       tooltip=NULL, legend=NULL ,width = NULL, height = NULL,
                       xrange=NULL, yrange=NULL, margins = NULL,
                       col_scale = RColorBrewer::brewer.pal(11,"RdBu")[11:1],
@@ -75,7 +75,7 @@ d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
         tooltip=tooltip,
         legend=legend,
         margins=margins,
-        callback_handler = callback_handler
+        callback = callback
     )
 
     if (collection){

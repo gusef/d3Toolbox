@@ -18,32 +18,30 @@ HTMLWidgets.widget({
             el.innerHTML = '';
 
             //figuring out width and height in a way that redrawing works
-            wid = wid === null ? width : wid;
-            hei = hei === null ? height : hei;
+            this.wid = wid === null ? width : this.wid;
+            this.hei = hei === null ? height : this.hei;
 
             this.collection = x;
-            svg  = d3.select(el).append("svg")
-                     .attr("width", wid)
-                     .attr("height", hei);
+            this.svg  = d3.select(el).append("svg")
+                          .attr("width", this.wid)
+                          .attr("height", this.hei);
 
-            this.draw_collection(svg, this.collection, wid, hei);
+            this.draw_collection(this.svg, this.collection, this.wid, this.hei);
         },
 
         resize: function(width, height) {
             el.innerHTML = '';
-            wid = width;
-            hei = height;
-            d3.select(el).select("svg")
-	            .attr("width", wid)
-	            .attr("height", hei);
-
-            this.draw_collection(svg, this.collection, wid, hei);
+            this.wid = width;
+            this.hei = height;
+            this.svg  = d3.select(el).append("svg")
+            	                .attr("width", this.wid)
+            	                .attr("height", this.hei);
+ 
+            this.draw_collection(this.svg, this.collection, this.wid, this.hei);
         },
 
 
         draw_collection : function(svg, collection, width, height){
-            console.log(collection);
-
             // fix the overall margins
             var margin = collection.margins;
             var top = collection.title !== null ? 30 : 0 ;
@@ -62,7 +60,7 @@ HTMLWidgets.widget({
                    .attr("font-size", "24px")
                    .text(collection.title);
             }
-
+            
             // then plot all of them one by one
             var current_x = 0;
             for (var i = 0; i < collection.lwid.length; i++) {
@@ -80,10 +78,10 @@ HTMLWidgets.widget({
                                        "translate(" + current_x + "," + current_y + ")");
 
                     if (collection.lmat[j][i] !== null){
-                        // fix the parameter passing so we pass the entire object to the sub directly in all plots
                         // call the appropriate plot
-                        sub_g.append('text').text(collection.data[collection.lmat[j][i]-1].type);
-                        //window["functionName"](arguments);
+                        var obj = collection.data[collection.lmat[j][i]-1];
+                        var func = 'draw_' + obj.type;
+                        window[func](sub_g, obj, current_wid, current_hei);
                     }
                     current_y += current_hei;
                 }

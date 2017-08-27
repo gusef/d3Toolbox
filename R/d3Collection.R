@@ -14,10 +14,10 @@ d3Collection <- function(data,
                          elementId = NULL) {
 
     if (is.null(margins)){
-        margins <- list(top = 40,
-                        right = 20,
-                        bottom = 50,
-                        left = 60)
+        margins <- list(top = 10,
+                        right = 40,
+                        bottom = 60,
+                        left = 10)
     }
 
     if (class(data) != 'list'){

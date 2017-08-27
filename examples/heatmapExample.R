@@ -23,11 +23,14 @@ ui <- fillPage(
 
 server <- function(input, output, session) {
 
-    eSet <- readRDS('/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/RNAseq_nodedup_cpm.RDS')
+    #dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
+    dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'
+    
+    eSet <- readRDS(paste0(dir,'RNAseq_nodedup_cpm.RDS'))
     eSet <- eSet[,eSet$Visit.Code == "SCREEN"]
 
     #fix genes
-    genes <- as.character(read.csv('/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/genes.txt')[,1])
+    genes <- as.character(read.csv(paste0(dir,'genes.txt'))[,1])
     eSet <- eSet[rowSums(exprs(eSet)) >0, ]
     exprs(eSet) <- log2(exprs(eSet) + 1)
     eSet <- eSet[fData(eSet)$hgnc_symbol %in% genes,]
@@ -53,7 +56,7 @@ server <- function(input, output, session) {
     left_mar <- 10
 
     output$key <- renderd3Barplot({
-        d3Barplot(rep(1,11),
+        d3Barplot(data=rep(1,11),
                   show_axes = F,
                   padding = 0,
                   col=RColorBrewer::brewer.pal(11,"RdBu")[11:1],

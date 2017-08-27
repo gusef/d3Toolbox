@@ -8,7 +8,7 @@ ui <- fillPage(fillRow(
     fillCol(
         d3DendrogramOutput("dend_test2", width = "100%", height = "100%"),
         h3(verbatimTextOutput("currentOutput")),
-#        tags$head(tags$script(src="d3Dendrogram.js")),
+        tags$head(tags$script(src="d3-toolbox.js")),
         flex = c(8,1,1))
     )
 )
@@ -18,7 +18,7 @@ server <- function(input, output, session) {
         dat <- t(mtcars)
         hc01.col <- hcopt(dist(t(dat)),method="ward.D")
         dend <- as.dendrogram(hc01.col)
-        d3Dendrogram(dend,
+        d3Dendrogram(data=dend,
                      title = "My dendrogram",
                      subtitle = "with subtitle",
                      horiz=T)
@@ -28,12 +28,12 @@ server <- function(input, output, session) {
         dat <- mtcars
         hc01.col <- hcopt(dist(t(dat)),method="ward.D")
         dend <- as.dendrogram(hc01.col)
-        d3Dendrogram(dend,
+        d3Dendrogram(data=dend,
                      lab_adj = 40,
-                     classic_tree = F,
+                     classic = F,
                      title = "My dendrogram",
                      subtitle = "with subtitle",
-                     callback_handler="DendSelection")
+                     callback="DendSelection")
     })
 
     output$currentOutput <- renderPrint({ print(input$DendSelection) })

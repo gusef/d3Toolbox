@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // barplot
-function draw_barplot(svg, data, param, width, height) {
-
+function draw_d3Barplot(svg, param, width, height) {
+    var data = param.data;
     var margin = param.margins;
     var top = param.title !== null ? 40 : 0 ;
 
@@ -49,7 +49,7 @@ function draw_barplot(svg, data, param, width, height) {
        .text(param.xlab);
 
     // title and subtitle
-    if (param.title !== ''){
+    if (param.title !== null){
         svg.append("text")
            .attr("text-anchor", "middle")
            .attr("transform", "translate("+ (width/2) +","+((margin.top+top)/3)+")")
@@ -57,7 +57,7 @@ function draw_barplot(svg, data, param, width, height) {
            .text(param.title);
     }
 
-    if (param.subtitle !== ''){
+    if (param.subtitle !== null){
         svg.append("text")
            .attr("text-anchor", "middle")
            .attr("transform", "translate("+ (width/2) +","+(2*(margin.top+top)/3)+")")
@@ -142,7 +142,17 @@ function draw_barplot(svg, data, param, width, height) {
 
 ////////////////////////////////////////////////////////////////////////////////
 //boxplot
-function draw_boxplot(svg, data, param, stats, outlier, width, height) {
+function draw_d3Boxplot(svg, param, width, height) {
+    
+    var data = param.data;
+    var stats = param.stats;
+    var outlier = param.outlier;
+    
+    //Special case where there is only one list element
+    if (typeof(param.names) === 'string'){
+        param.names = [param.names];
+        param.col = [param.col];
+    }
 
 	var margin = param.margins;
     var top = param.title !== null ? 40 : 0 ;
@@ -314,8 +324,9 @@ function draw_boxplot(svg, data, param, stats, outlier, width, height) {
 
 ////////////////////////////////////////////////////////////////////////////////
 //scatter plot
-function draw_scatter(svg, data, param, width, height) {
-    d3data = HTMLWidgets.dataframeToD3(data);
+function draw_d3Scatter(svg, param, width, height) {
+    var data = param.data;
+    var d3data = HTMLWidgets.dataframeToD3(data);
 
     var margin = param.margins;
     var top = param.title !== null ? 40 : 0 ;
@@ -498,7 +509,8 @@ function draw_scatter(svg, data, param, width, height) {
 
 ////////////////////////////////////////////////////////////////////////////////
 //dendrogram
-function draw_dendrogram(svg, tree, param, width, height) {
+function draw_d3Dendrogram(svg, param, width, height) {
+    var tree = param.data;
 
 	var margin = param.margins;
     var top = param.title !== null ? 40 : 0 ;
@@ -574,6 +586,8 @@ function draw_dendrogram(svg, tree, param, width, height) {
                 .enter().append("g")
                 .each(function(d) { d.linkNode = this; })
                 .attr("class", "g_dend");
+                
+                
     if (param.classic){
         if (param.horiz){
             // add line from parent
@@ -698,8 +712,10 @@ function draw_dendrogram(svg, tree, param, width, height) {
 
 ////////////////////////////////////////////////////////////////////////////////
 //Image
-function draw_image(svg, data, raw_values, param, width, height) {
+function draw_d3Image(svg, param, width, height) {
 
+    var data = param.data;
+    var raw_values = param.raw_values;
 	var margin = param.margins;
     var top = param.title !== null ? 40 : 0 ;
 

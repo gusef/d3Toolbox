@@ -44,7 +44,7 @@ server <- function(input, output, session) {
                   subtitle='subtitle',
                   tooltip = c('Species','z'),
                   legend = legend,
-                  callback_handler='ScatterSelection')
+                  callback='ScatterSelection')
     })
 
     observeEvent(input$change,{
@@ -79,7 +79,7 @@ server <- function(input, output, session) {
                   title='Iris dataset',
                   subtitle='subtitle',
                   tooltip = c('Species'),
-                  callback_handler='ScatterSelection')
+                  callback='ScatterSelection')
     })
 
     output$currentOutput <- renderPrint({ print(input$ScatterSelection) })

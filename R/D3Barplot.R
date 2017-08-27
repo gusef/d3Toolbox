@@ -5,9 +5,9 @@
 #' @import htmlwidgets
 #'
 #' @export
-d3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', padding=0.1,
-                      show_axes = TRUE, title='', subtitle='',
-                      callback_handler='BarSelection', yrange=NULL,
+d3Barplot <- function(data, col='black', tooltip=NULL, unit='', xlab='', ylab='', padding=0.1,
+                      show_axes = TRUE, title=NULL, subtitle=NULL,
+                      callback='BarSelection', yrange=NULL,
                       margins = NULL, width = NULL, height = NULL,
                       elementId = NULL, collection = FALSE) {
 
@@ -27,6 +27,7 @@ d3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', 
 
     #if we have only one variable
     if (is.null(dim(data))){
+        singleVar = TRUE
         data <- data.frame(x=data)
         #fix the coloring
         if(length(col)==1){
@@ -34,33 +35,41 @@ d3Barplot <- function(data, col='black', tooltip='', unit='', xlab='', ylab='', 
         }
     #stacked barplot
     }else{
+        singleVar = FALSE
         if(length(col)!=ncol(data)){
             stop('Need to specify one color for each variable')
         }
     }
-
+    
+    #get max value
+    max_value = max(rowSums(data))
+    
     #separate names and data
-    name <- rownames(data)
+    data$name <- rownames(data)
     rownames(data) <- NULL
+
+    
+    if (!is.null(tooltip)){
+        data$tooltip <- tooltip;
+    }
 
     # forward options using x
     x = list(
         type = "d3Barplot",
         data = data,
-        name = name,
-        tooltip = tooltip,
         fill = col,
         unit = unit,
         xlab = xlab,
         ylab = ylab,
+        singleVar = singleVar,
         show_axes = show_axes,
         yrange = yrange,
         padding = padding,
         title = title,
-        max_value = max(rowSums(data)),
+        max_value = max_value,
         subtitle = subtitle,
         margins=margins,
-        callback_handler = callback_handler
+        callback = callback
     )
 
     if (collection){

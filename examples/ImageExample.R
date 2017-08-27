@@ -34,7 +34,7 @@ server <- function(input, output, session) {
                   title='Iris dataset',
                   subtitle='subtitle',
                   tooltip = c('Species','z'),
-                  callback_handler='ScatterSelection')
+                  callback='ScatterSelection')
     })
 
     output$filterpanel <- renderd3Image({

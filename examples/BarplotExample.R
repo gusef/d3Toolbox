@@ -10,8 +10,8 @@ ui <- fillPage(fillRow(
     h3(verbatimTextOutput("currentOutput")),
     d3BarplotOutput("filterpanel", width = "100%", height = "100%"),
     plotOutput("lowdimpanel", height = "100%")
-  ),flex = c(2,1))#,
-#   tags$head(tags$script(src="D3Barplot.js"))
+  ),flex = c(2,1))
+  ,tags$head(tags$script(src="d3-toolbox.js"))
 )
 
 server <- function(input, output, session) {
@@ -29,20 +29,20 @@ server <- function(input, output, session) {
                 ylab='Frequencies',
                 title='New Barplot',
                 subtitle='with subtitle',
-                callback_handler='BarSelection')
+                callback='BarSelection')
   })
 
   output$filterpanel <- renderd3Barplot({
       data <- 1:15
-      names(data) <- c(LETTERS[1:15])
+      names(data) <- c(LETTERS[1:11])
       d3Barplot(data,
-                col=c('steelblue'),
+                col=RColorBrewer::brewer.pal(11,"RdBu")[11:1],
                 xlab='Letters',
                 ylab='Frequencies',
                 yrange=c(0,20),
                 title='New Barplot',
                 subtitle='with subtitle',
-                callback_handler='BarSelection1')
+                callback='BarSelection1')
   })
 
 
