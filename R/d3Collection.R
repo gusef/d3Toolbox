@@ -33,15 +33,12 @@ d3Collection <- function(data,
     }
 
     #check the layout
-    lmat <- matrix(c(1,NA,4,2,3,5),ncol=2)
-
-
     if (class(lwid) != 'numeric' || length(lwid) != ncol(lmat)){
-        stop('lwid needs to be a numeric vector with lenght == ncol(lmat)')
+        stop('lwid needs to be a numeric vector with length == ncol(lmat)')
     }
 
     if (class(lhei) != 'numeric' || length(lhei) != nrow(lmat)){
-        stop('lwid needs to be a numeric vector with lenght == nrow(lmat)')
+        stop('lwid needs to be a numeric vector with length == nrow(lmat)')
     }
 
     #normalize

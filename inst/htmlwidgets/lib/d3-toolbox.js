@@ -1,8 +1,48 @@
 ////////////////////////////////////////////////////////////////////////////////
-// barplot
-function draw_d3Colorkey(svg, param, width, height){
-    console.log(param);
+// Legend
+function draw_d3Legend(svg, param, width, height){
+    var top = param.title === null ? 0 : 10;
     
+    var g = svg.append("g")
+    	       .attr("transform", 
+    	             "translate(" + param.margins.left + "," + (param.margins.top + top) + ")");
+    
+    if (param.title !== null){
+        svg.append("text")
+           .attr("text-anchor", "start")
+           .attr("transform", "translate("+ 15 +","+ 15 + ")")
+           .attr("font-size", param.fontsize)
+           .attr("font-weight", "bold")
+           .text(param.title);
+    }
+    
+    var d3data = HTMLWidgets.dataframeToD3(param.legend);
+    
+    g.selectAll(".legend")
+      .data(d3data)
+      .enter().append("rect")
+      .attr("class", "legend")
+      .attr("x", 5)
+      .attr("y", function(d,i) { return i * (param.square + 10); })
+      .attr("width", param.square)
+      .attr("height", param.square)
+      .attr("fill", function(d, i) { return d.color; });
+    
+    g.selectAll(".legtext")
+      .data(d3data)
+      .enter().append("text")
+       .attr("class", "legtext")
+       .text(function(d){ return d.text; })
+       .attr("font-size", param.fontsize)
+       .attr("x", param.square + 10)
+       .attr("y", function(d,i) { return  2+ param.square/2 + i * (param.square + 10); })
+       .attr("text-anchor", "start");
+    
+}
+    
+////////////////////////////////////////////////////////////////////////////////
+// Colorkey
+function draw_d3Colorkey(svg, param, width, height){
     var wid = param.keysize.width;
     var hei = param.keysize.height;
     

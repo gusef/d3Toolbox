@@ -9,7 +9,7 @@ ui <- fillPage(fillRow(
     h3(verbatimTextOutput("currentOutput")),
     plotOutput("filterpanel", width = "100%", height = "100%")
   ),flex = c(2,1))
- # ,tags$head(tags$script(src="d3-toolbox.js"))
+  ,tags$head(tags$script(src="d3-toolbox.js"))
 )
 
 
@@ -42,7 +42,7 @@ readeSet <- function(){
     left_dend <- as.dendrogram(hc01.row)
     rowInd <- order.dendrogram(left_dend)
 
-    right_mar <- 100
+    right_mar <- 80
     bottom_mar <- 100
     left_mar <- 10
 
@@ -101,8 +101,6 @@ readeSet <- function(){
                                    left = left_mar))
 
     #expression matrix
-
-
     data[[5]] <- list(type = 'd3Image',
                       data=x,
                       raw_values=dat,
@@ -114,7 +112,13 @@ readeSet <- function(){
                                    right = right_mar,
                                    bottom = bottom_mar,
                                    left = 0))
-
+    
+    #legend
+    data[[6]] <- list(type = 'd3Legend',
+                      colors = c('#2ca25f','#f03b20','#99d8c9','#ffeda0')[c(1,3,4,2)],
+                      text = levels(eSet$BORI)[c(1,3,4,2)],
+                      title = 'RECIST')
+    
     return(data)
 }
 
@@ -123,9 +127,8 @@ server <- function(input, output, session) {
     values <- reactiveValues(data=readeSet())
 
     output$heatmap <- renderd3Collection({
-
-        lmat <- matrix(c(1,NA,4,2,3,5),ncol=2)
-        lwid <- c(3,10)
+        lmat <- matrix(c(1,NA,4,2,3,5,6,NA,NA),ncol=3)
+        lwid <- c(3,10,3)
         lhei <- c(3,1,10)
 
         d3Collection(values$data,

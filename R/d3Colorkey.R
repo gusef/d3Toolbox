@@ -56,7 +56,7 @@ d3Colorkey <- function(data,
 
 #' Shiny bindings for D3Colorkey
 #'
-#' Output and render functions for using D3Barplot within Shiny
+#' Output and render functions for using D3Legend within Shiny
 #' applications and interactive Rmd documents.
 #'
 #' @param outputId output variable to read from
