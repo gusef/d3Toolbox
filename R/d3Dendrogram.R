@@ -20,8 +20,8 @@ d3Dendrogram <- function(data, horiz = FALSE, label = TRUE, classic = TRUE,
     if (class(data) != 'dendrogram'){
         stop('Object dend needs to be a dendrogram')
     }
-
-    data <- getDendTree(data)
+    
+    data <- getDendTree(data, horiz)
 
     # forward options using x
     x = list(
@@ -54,7 +54,7 @@ d3Dendrogram <- function(data, horiz = FALSE, label = TRUE, classic = TRUE,
     }
 }
 
-getDendTree <- function(dend){
+getDendTree <- function(dend, horiz){
 
     ret <- list(children = list(),
                 label = '',
@@ -66,8 +66,13 @@ getDendTree <- function(dend){
     }else{
         ret$type <- 'branch'
         ret$height <- attributes(dend)$height
-        ret$children[[1]] <- getDendTree(dend[[1]])
-        ret$children[[2]] <- getDendTree(dend[[2]])
+        if (horiz){
+            ret$children[[1]] <- getDendTree(dend[[2]], horiz)
+            ret$children[[2]] <- getDendTree(dend[[1]], horiz)
+        } else {
+            ret$children[[1]] <- getDendTree(dend[[1]], horiz)
+            ret$children[[2]] <- getDendTree(dend[[2]], horiz)
+        }
     }
 
     return (ret)

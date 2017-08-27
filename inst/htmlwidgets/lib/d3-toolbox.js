@@ -1,5 +1,105 @@
 ////////////////////////////////////////////////////////////////////////////////
 // barplot
+function draw_d3Colorkey(svg, param, width, height){
+    console.log(param);
+    
+    var wid = param.keysize.width;
+    var hei = param.keysize.height;
+    
+    var g = svg.append("g")
+    	       .attr("transform", "translate(" + (width - wid)/2 + "," + (height - hei)/2 + ")");
+
+  // scales
+    var x = d3.scaleLinear()
+              .domain([Math.min.apply(null,param.hist.breaks), 
+                       Math.max.apply(null,param.hist.breaks)])
+              .rangeRound([0, wid]);
+    var y = d3.scaleLinear()
+              .domain([0, Math.max.apply(null,param.hist.counts) * 1.1])
+              .rangeRound([hei, 0]);
+
+    // add the x and y axes
+ 	g.append("g")
+     .attr("class", "axis axis--x")
+	 .attr("transform", "translate(0," + hei + ")")
+	 .call(d3.axisBottom(x).ticks(4));
+
+	g.append("g")
+	 .attr("class", "axis axis--y")
+	 .call(d3.axisLeft(y).ticks(4));
+
+    // now add titles to the axes
+    svg.append("text")
+       .attr("text-anchor", "middle")
+       .attr("transform", "translate("+ (((width - wid) / 2) - 30)  +","+ (height/2) + ")rotate(-90)")
+       .text(param.ylab);
+
+    svg.append("text")
+       .attr("text-anchor", "middle")
+       .attr("transform", "translate("+ (width/2) +","+(hei + ((height - hei) / 2) + 30) + ")")
+       .text(param.xlab);
+
+    svg.append("text")
+           .attr("text-anchor", "middle")
+           .attr("transform", "translate("+ (width/2) +","+ (height - hei - ((height - hei) / 2) - 20) + ")")
+           .attr("font-size", "12px")
+           .attr("font-weight", "bold")
+           .text(param.title);
+
+    svg.append("text")
+           .attr("text-anchor", "middle")
+           .attr("transform", "translate("+ (width/2) +","+ (height - hei - ((height - hei) / 2) - 5 ) +")")
+           .attr("font-size", "12px")
+           .attr("font-weight", "bold")
+           .text(param.subtitle);
+
+    // update the scales
+    var col = d3.scaleBand()
+                .domain(param.colscale)
+                .rangeRound([0, wid]);
+  
+    var bar = g.selectAll(".colkey")
+               .data(param.colscale)
+               .enter().append("g")
+               .attr("class", "colkey");
+
+    // add the color bars               
+    g.selectAll(".bar")
+     .data(param.colscale)
+     .enter().append("rect")
+     .attr("class", "bar")
+     .attr("x", function(d) { return col(d); })
+     .attr("y", 0)
+     .attr("width", col.bandwidth())
+     .attr("height", hei)
+     .attr("fill", function(d) { return d; });
+
+    // add the histogram lines
+    g.selectAll(".countline")
+     .data(param.colscale)
+     .enter().append("line")
+     .attr("class", "countline")
+     .attr("x1", function(d) { return col(d); })
+     .attr("y1", function(d, i) { return y(param.hist.counts[i]); })
+     .attr("x2", function(d) { return col(d) + col.bandwidth(); } )
+     .attr("y2", function(d, i) { return y(param.hist.counts[i]); })
+     .attr("stroke", "Aqua");
+     
+    // add the vertical histogram lines
+    g.selectAll(".verticalcount")
+     .data(param.colscale)
+     .enter().append("line")
+     .attr("class", "countline")
+     .attr("x1", function(d) { return col(d); })
+     .attr("y1", function(d, i) { return i === 0 ? y(0) : y(param.hist.counts[i-1]); })
+     .attr("x2", function(d) { return col(d); } )
+     .attr("y2", function(d, i) { return y(param.hist.counts[i]); })
+     .attr("stroke", "Aqua");
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// barplot
 function draw_d3Barplot(svg, param, width, height) {
     var data = param.data;
     var margin = param.margins;

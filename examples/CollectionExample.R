@@ -1,16 +1,15 @@
 require(Biobase)
 require(RColorBrewer)
 require(d3Toolbox)
+require(gplots)
 
 ui <- fillPage(fillRow(
   d3CollectionOutput("heatmap", width = "100%", height = "100%"),
   fillCol(
     h3(verbatimTextOutput("currentOutput")),
-    d3BarplotOutput("filterpanel", width = "100%", height = "100%"),
-    d3ScatterOutput("lowdimpanel", width = "100%", height = "100%")
+    plotOutput("filterpanel", width = "100%", height = "100%")
   ),flex = c(2,1))
-  ,tags$head(tags$script(src="d3Collection.js"))
-  ,tags$head(tags$script(src="d3-toolbox.js"))
+ # ,tags$head(tags$script(src="d3-toolbox.js"))
 )
 
 
@@ -47,19 +46,22 @@ readeSet <- function(){
     bottom_mar <- 100
     left_mar <- 10
 
+    
+    dat <- exprs(eSet)
+    dat <- dat[rowInd,colInd]
+    rm <- rowMeans(dat, na.rm = F)
+    x <- sweep(dat, 1, rm)
+    sx <- apply(x, 1, sd, na.rm = F)
+    x <- sweep(x, 1, sx, "/")
+    
+    
     #make a data list
     data <- list()
 
     #color key
-    data[[1]] <- list(type = 'd3Barplot',
-                      data = rep(1,11),
-                      show_axes = F,
-                      padding = 0,
-                      col=RColorBrewer::brewer.pal(11,"RdBu")[11:1],
-                      margins=list(top = 40,
-                                   right = 40,
-                                   bottom = 40,
-                                   left = 40))
+    data[[1]] <- list(type = 'd3Colorkey',
+                      data = x,
+                      colscale=RColorBrewer::brewer.pal(11,"RdBu")[11:1])
 
     #top dendrogram
     data[[2]] <- list(type = 'd3Dendrogram',
@@ -99,12 +101,7 @@ readeSet <- function(){
                                    left = left_mar))
 
     #expression matrix
-    dat <- exprs(eSet)
-    dat <- dat[rowInd,colInd]
-    rm <- rowMeans(dat, na.rm = F)
-    x <- sweep(dat, 1, rm)
-    sx <- apply(x, 1, sd, na.rm = F)
-    x <- sweep(x, 1, sx, "/")
+
 
     data[[5]] <- list(type = 'd3Image',
                       data=x,
@@ -132,41 +129,46 @@ server <- function(input, output, session) {
         lhei <- c(3,1,10)
 
         d3Collection(values$data,
-                  lmat,
-                  lwid,
-                  lhei,
-                  title='Second heatmap prototype')
+                      lmat,
+                      lwid,
+                      lhei,
+                      title='Second heatmap prototype')
     })
 
-    output$filterpanel <- renderd3Barplot({
-        data <- data.frame(x=(1:15),
-                           y=(1:15)/2,
-                           z=15:1)
-        rownames(data) <- c(LETTERS[1:15])
-
-        d3Barplot(data,
-                  col=c('steelblue','grey','#de2d26'),
-                  tooltip=c(paste0('letter_',LETTERS[1:15])),
-                  xlab='Letters',
-                  ylab='Frequencies',
-                  title='New Barplot',
-                  subtitle='with subtitle')
-    })
-
-    output$lowdimpanel <- renderd3Scatter({
-        data <- data.frame(x=iris$Sepal.Length,
-                           y=iris$Sepal.Width,
-                           z=iris$Petal.Length,
-                           Species=iris$Species)
-        d3Scatter(data,
-                  col=iris$Petal.Length,
-                  dotsize = 3,
-                  xlab='Sepal Length',
-                  ylab='Sepal Width',
-                  title='Iris dataset',
-                  subtitle='subtitle',
-                  tooltip = c('Species'),
-                  callback='ScatterSelection')
+    output$filterpanel <- renderPlot({
+        #dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
+        dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'
+        
+        eSet <- readRDS(paste0(dir,'RNAseq_nodedup_cpm.RDS'))
+        eSet <- eSet[,eSet$Visit.Code == "SCREEN"]
+        
+        #fix genes
+        genes <- as.character(read.csv(paste0(dir,'genes.txt'))[,1])
+        eSet <- eSet[rowSums(exprs(eSet)) >0, ]
+        exprs(eSet) <- log2(exprs(eSet) + 1)
+        eSet <- eSet[fData(eSet)$hgnc_symbol %in% genes,]
+        rownames(eSet) <- fData(eSet)$hgnc_symbol
+        
+        #fix labels
+        eSet$BORI[eSet$BORI=='NE'] <- NA
+        eSet$BORI <- droplevels(eSet$BORI)
+        colnames(eSet) <- eSet$SUBJID
+        
+        #top dendrogram
+        hc01.col <- hcopt(dist(t(exprs(eSet))),method="ward.D")
+        top_dend <- as.dendrogram(hc01.col)
+        
+        #left dendrogram
+        hc01.row <- hcopt(as.dist(1-cor(t(exprs(eSet)))),method="ward.D")
+        left_dend <- as.dendrogram(hc01.row)
+        
+        heatmap.2(x = exprs(eSet),
+                  scale='row',
+                  col = RColorBrewer::brewer.pal(11,"RdBu")[11:1],
+                  ColSideColors = c('#2ca25f','#f03b20','#99d8c9','#ffeda0')[as.numeric(eSet$BORI)],
+                  Rowv = left_dend,
+                  Colv = top_dend,
+                  trace = 'none')
     })
 
     output$currentOutput <- renderPrint({ print(input$ScatterSelection) })
