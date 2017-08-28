@@ -20,7 +20,11 @@ d3Dendrogram <- function(data, horiz = FALSE, label = TRUE, classic = TRUE,
     if (class(data) != 'dendrogram'){
         stop('Object dend needs to be a dendrogram')
     }
-    
+
+    label_text <- labels(data)
+    if(horiz){
+        label_text <- label_text[length(label_text):1]
+    }
     data <- getDendTree(data, horiz)
 
     # forward options using x
@@ -30,6 +34,7 @@ d3Dendrogram <- function(data, horiz = FALSE, label = TRUE, classic = TRUE,
         horiz = horiz,
         label = label,
         lab_adj = lab_adj,
+        label_text = label_text,
         classic = classic,
         axis = axis,
         title = title,

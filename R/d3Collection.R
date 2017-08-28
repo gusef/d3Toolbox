@@ -10,6 +10,7 @@ d3Collection <- function(data,
                          lwid = rep.int(1, ncol(lmat)),
                          lhei = rep.int(1, nrow(lmat)),
                          title = NULL,
+                         connectors = NULL,
                          width = NULL, height = NULL, margins = NULL,
                          elementId = NULL) {
 
@@ -61,6 +62,7 @@ d3Collection <- function(data,
         lwid = lwid,
         lhei = lhei,
         title = title,
+        connectors = connectors,
         margins=margins
     )
 

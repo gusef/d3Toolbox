@@ -36,7 +36,7 @@ HTMLWidgets.widget({
             this.svg  = d3.select(el).append("svg")
             	                .attr("width", this.wid)
             	                .attr("height", this.hei);
- 
+
             this.draw_collection(this.svg, this.collection, this.wid, this.hei);
         },
 
@@ -60,7 +60,7 @@ HTMLWidgets.widget({
                    .attr("font-size", "24px")
                    .text(collection.title);
             }
-            
+
             // then plot all of them one by one
             var current_x = 0;
             for (var i = 0; i < collection.lwid.length; i++) {
@@ -77,17 +77,28 @@ HTMLWidgets.widget({
                                  .attr("transform",
                                        "translate(" + current_x + "," + current_y + ")");
 
-                    if (collection.lmat[j][i] !== null){
+                    var id = collection.lmat[j][i];
+                    if (id !== null){
                         // call the appropriate plot
-                        var obj = collection.data[collection.lmat[j][i]-1];
+                        var obj = collection.data[id-1];
                         var func = 'draw_' + obj.type;
-                        window[func](sub_g, obj, current_wid, current_hei);
+                        window[func](sub_g, obj, current_wid, current_hei, this, id);
                     }
                     current_y += current_hei;
                 }
             current_x +=  current_wid;
             }
+        },
 
+        update : function(collection, id, axis, index){
+
+            var con = collection.collection.connectors;
+
+            if (con !== null){
+                for (var i = 0; j < con.length; j++) {
+
+                }
+            }
         }
 
     };
