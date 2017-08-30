@@ -127,7 +127,7 @@ server <- function(input, output, session) {
     values <- reactiveValues(data=readeSet())
 
     output$heatmap <- renderd3Collection({
-        lmat <- matrix(c(1,NA,4,2,3,5,6,NA,NA),ncol=3)
+        lmat <- matrix(c(1,NA,4,2,3,5,6,6,6),ncol=3)
         lwid <- c(3,10,3)
         lhei <- c(3,1,10)
 

@@ -42,6 +42,23 @@ d3Collection <- function(data,
         stop('lwid needs to be a numeric vector with length == nrow(lmat)')
     }
 
+    if (!is.null(connectors)){
+        if (!all(sapply(connectors,dim)[,2]==2)){
+            stop('Connectors must be a list where each element has 2 columns.',
+                 ':"names" corresponding to the layout and ',
+                 '"dims" corresponding to the dimension in the chosen d3Plot')
+        }
+        if (!all(sapply(connectors,function(x,lmat)all(x[,1] %in% lmat),lmat))){
+            stop('Connectors must be a list where each element has 2 columns.',
+                 'The first row, "names" must be correspond to the layout index',
+                 'and no idizes not included in lmat are allowed.')
+        }
+        for (i in 1:length(connectors)){
+            names(connectors[[i]]) <- c('names','dims')
+        }
+    }
+
+
     #normalize
     lwid <- lwid / sum(lwid)
     lhei <- lhei / sum(lhei)

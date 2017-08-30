@@ -1,3 +1,7 @@
+.cell--inactive {
+    fill-opacity: 0.25 !important;
+}
+
 .node circle {
   fill: #999;
 }

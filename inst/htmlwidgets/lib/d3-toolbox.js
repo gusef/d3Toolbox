@@ -40,6 +40,11 @@ function draw_d3Legend(svg, param, width, height, collection, id){
 
 }
 
+function update_d3Legend(obj, dim, index) {
+
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Colorkey
 function draw_d3Colorkey(svg, param, width, height, collection, id){
@@ -137,6 +142,9 @@ function draw_d3Colorkey(svg, param, width, height, collection, id){
      .attr("stroke", "Aqua");
 }
 
+function update_d3Colorkey(obj, dim, index) {
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // barplot
@@ -294,6 +302,10 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
             });
 
     }
+}
+
+function update_d3Barplot(obj, dim, index) {
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -487,6 +499,10 @@ function draw_d3Boxplot(svg, param, width, height, collection, id) {
     }
 }
 
+function update_d3Boxplot(obj, dim, index) {
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //scatter plot
 function draw_d3Scatter(svg, param, width, height, collection, id) {
@@ -670,6 +686,10 @@ function draw_d3Scatter(svg, param, width, height, collection, id) {
               .style("text-anchor", "end")
               .text(function(d) { return d.name; });
     }
+}
+
+function update_d3Scatter(obj, dim, index) {
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -887,6 +907,11 @@ function draw_d3Dendrogram(svg, param, width, height, collection, id) {
     }
 }
 
+function update_d3Dendrogram(obj, dim, index) {
+
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //Image
 function draw_d3Image(svg, param, width, height, collection, id) {
@@ -974,7 +999,7 @@ function draw_d3Image(svg, param, width, height, collection, id) {
                 var ret;
                 //if this was called by a collection
                 if (collection !== 'undefined'){
-                    ret = collection.update(collection,id, click_type, i);
+                    ret = collection.update(collection,id, click_type, [i]);
                 }else{
                     ret = Shiny.onInputChange(param.callback,
                                               {"type" : click_type,
@@ -1043,4 +1068,47 @@ function draw_d3Image(svg, param, width, height, collection, id) {
     }
 }
 
+function update_d3Image(svg, dim, index) {
+
+    // highlight the labels
+    var sel = dim === 'row' ? '.ylab' : '.selectlabel';
+    sel = dim === 'column' ? '.xlab' : sel;
+    var labs = svg.selectAll(sel);
+
+    labs.each(function(d, i){
+                var active = false;
+                //the column ordering is inverse
+                var idx = dim === 'row' ? labs.size() - 1 - i : i;
+                if (index.length > 0 && index.includes(idx)){
+                    active = true;
+                }
+                d3.select(this)
+                            .classed("label--active", active);} );
+
+    //inactivate all cells that are not selected
+    svg.selectAll('.cell')
+       .each(function(d, i){
+            var inactivate = true;
+            var current = d3.select(this);
+            var idx;
+
+            // get the appropriate index
+            if (dim === 'column'){
+                idx = current.attr('column');
+            } else {
+                var parent = current.node().parentNode;
+                idx = d3.select(parent).attr('row');
+                //reverse the ordering
+                idx = labs.size() - 1 - idx;
+            }
+
+            //check if the index is selected
+            if (index.length === 0 || index.includes(+idx)){
+                inactivate = false;
+            }
+
+            //deactivate the non-selected cells
+            current.classed("cell--inactive", inactivate); });
+
+}
 
