@@ -126,16 +126,14 @@ HTMLWidgets.widget({
                 }
             }
 
-            console.log(typeof(index));
-            console.log(index);
-
-
-            //return values to shiny
-            Shiny.onInputChange(obj.collection.callback,
+            if (axis !== ''){
+               //return values to shiny
+                Shiny.onInputChange(obj.collection.callback,
                                {"plot_id" : id + 1,
                                 "plot_type" : obj.collection.data[id].type,
                                 "axis" : axis,
                                 "indices" : index});
+            }
         }
     };
   }

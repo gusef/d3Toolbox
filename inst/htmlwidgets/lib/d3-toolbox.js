@@ -48,8 +48,10 @@ function update_d3Legend(obj, dim, index) {
 ////////////////////////////////////////////////////////////////////////////////
 // Colorkey
 function draw_d3Colorkey(svg, param, width, height, collection, id){
-    var wid = param.keysize.width;
-    var hei = param.keysize.height;
+
+    //adjust the size of the key if it gets too small
+    var wid = (width - 40)  < param.keysize.width ? width - 40 : param.keysize.width;
+    var hei = (height - 20)  < param.keysize.height ? height - 20 : param.keysize.height;
 
     var g = svg.append("g")
     	       .attr("transform", "translate(" + (width - wid)/2 + "," + (height - hei)/2 + ")");
@@ -82,7 +84,7 @@ function draw_d3Colorkey(svg, param, width, height, collection, id){
     svg.append("text")
        .attr("text-anchor", "middle")
        .attr("transform", "translate("+ (width/2) +","+(hei + ((height - hei) / 2) + 30) + ")")
-       .text(param.xlab);
+       .text(hei == param.keysize.height ? param.xlab : '');
 
     svg.append("text")
            .attr("text-anchor", "middle")
@@ -931,8 +933,14 @@ function update_d3Dendrogram(svg, dim, index, data) {
                                   .getAttribute('children')
                                   .split(',')
                                   .map(function(e){return +e; });
+
             // are any children of this node selected?
-            var selected = indices.filter((n) => index.includes(n)).length !== 0;
+            var selected = false;
+            for (var i = 0; !selected && i < indices.length; i++) {
+                if (index.indexOf(indices[i]) > -1) {
+                    selected = true;
+                }
+            }
 
             //switch the links
             current.select(".link--child").classed("link--selected", selected);
@@ -1112,11 +1120,13 @@ function update_d3Image(svg, dim, index, data) {
     var sel = dim === 'row' ? '.ylab' : '.selectlabel';
     sel = dim === 'column' ? '.xlab' : sel;
     var labs = svg.selectAll(sel);
-
     labs.each(function(d, i){
                 var active = false;
+                console.log(index);
+                console.log(i);
+                console.log(d);
                 //the column ordering is inverse
-                if (index.length > 0 && index.includes(i)){
+                if (index.length > 0 && index.includes([i])){
                     active = true;
                 }
                 d3.select(this).classed("label--selected", active);} );
