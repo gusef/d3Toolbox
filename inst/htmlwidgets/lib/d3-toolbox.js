@@ -770,7 +770,17 @@ function draw_d3Dendrogram(svg, param, width, height, collection, id) {
                 .data(root.descendants().slice(1))
                 .enter().append("g")
                 .each(function(d) { d.linkNode = this; })
-                .attr("class", "g_dend");
+                .attr("class", "g_dend")
+                .attr("children", function(d){
+                    return d.descendants()
+                            .map(function(child){return child.data.label})
+                            .filter(function(r){ return r !== ""; })
+                            .map(function(lab) {
+                                var idx = param.label_text.indexOf(lab);
+                                // reverse the index order if its a horizontal dendrogram
+                                idx = param.horiz ? param.label_text.length - 1 - idx : idx;
+                                return idx; })
+                            .join(); });
 
 
     if (param.classic){
@@ -867,19 +877,21 @@ function draw_d3Dendrogram(svg, param, width, height, collection, id) {
             var labels = d.descendants()
                        .map(function(e) { return e.data.label; })
                        .filter(function(r){ return r !== ""; });
-            var ret;
             //if this was called by a collection
             if (collection !== 'undefined'){
-                var indices = labels.map(function(lab) { return param.label_text.indexOf(lab); });
+                var indices = labels.map(function(lab) {
+                                            var idx = param.label_text.indexOf(lab);
+                                            // reverse the index order if its a horizontal dendrogram
+                                            idx = param.horiz ? param.label_text.length - 1 - idx : idx;
+                                            return idx});
                 function sortNumber(a,b) {
                     return a - b;
                 }
-                ret = collection.update(collection, id, 'value', indices.sort(sortNumber));
+                collection.update(collection, id, 'value', indices.sort(sortNumber));
             //otherwise return to shiny
             }else{
-                ret = Shiny.onInputChange(param.callback, labels);
+                Shiny.onInputChange(param.callback, labels);
             }
-            return ret;
         };
     }
 
@@ -907,10 +919,27 @@ function draw_d3Dendrogram(svg, param, width, height, collection, id) {
     }
 }
 
-function update_d3Dendrogram(obj, dim, index) {
+function update_d3Dendrogram(svg, dim, index, data) {
+
+    //inactivate all cells that are not selected
+    svg.selectAll('.g_dend')
+       .each(function(d, i){
+            var current = d3.select(this);
+
+            // get all children indices
+            var indices = current.node()
+                                  .getAttribute('children')
+                                  .split(',')
+                                  .map(function(e){return +e; });
+            // are any children of this node selected?
+            var selected = indices.filter((n) => index.includes(n)).length !== 0;
+
+            //switch the links
+            current.select(".link--child").classed("link--selected", selected);
+            current.select(".link--parent").classed("link--selected", selected);
+            current.select(".link--curved").classed("link--selected", selected); });
 
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //Image
@@ -951,8 +980,12 @@ function draw_d3Image(svg, param, width, height, collection, id) {
                  .domain(param.xax)
                  .range([0, wid]);
 
+    var font_size;
     //show the labels on the bottom
     if (param.show_xax){
+
+        font_size = param.lab_font_size < xlab.bandwidth() ? param.lab_font_size : xlab.bandwidth();
+
         var xlabels = g.selectAll(".xlab")
                        .data(param.xax)
                        .enter().append("text")
@@ -962,6 +995,7 @@ function draw_d3Image(svg, param, width, height, collection, id) {
                        .attr("y", hei + 3)
                        .attr("transform", function(d) { return "rotate(270," + (xlab(d)  + 0.8 * xlab.bandwidth()) + "," + (hei + 3) + ")"; })
                        .style("text-anchor", "end")
+                       .style("font-size", font_size)
                        .on("click", click("column"))
                        .on("mouseover", mouseov(true))
                        .on("mouseout", mouseov(false));
@@ -973,6 +1007,9 @@ function draw_d3Image(svg, param, width, height, collection, id) {
 
     //show the labels on the right
     if (param.show_yax){
+
+        font_size = param.lab_font_size < ylab.bandwidth() ?  param.lab_font_size : ylab.bandwidth();
+
         var ylabels = g.selectAll(".ylab")
                        .data(param.yax)
                        .enter().append("text")
@@ -981,6 +1018,7 @@ function draw_d3Image(svg, param, width, height, collection, id) {
                        .attr("x", wid + 3)
                        .attr("y", function(d) { return ylab(d)  + 0.8 * ylab.bandwidth(); })
                        .style("text-anchor", "start")
+                       .style("font-size", font_size)
                        .on("click", click("row"))
                        .on("mouseover", mouseov(true))
                        .on("mouseout", mouseov(false));
@@ -1068,7 +1106,7 @@ function draw_d3Image(svg, param, width, height, collection, id) {
     }
 }
 
-function update_d3Image(svg, dim, index) {
+function update_d3Image(svg, dim, index, data) {
 
     // highlight the labels
     var sel = dim === 'row' ? '.ylab' : '.selectlabel';
@@ -1078,12 +1116,10 @@ function update_d3Image(svg, dim, index) {
     labs.each(function(d, i){
                 var active = false;
                 //the column ordering is inverse
-                var idx = dim === 'row' ? labs.size() - 1 - i : i;
-                if (index.length > 0 && index.includes(idx)){
+                if (index.length > 0 && index.includes(i)){
                     active = true;
                 }
-                d3.select(this)
-                            .classed("label--active", active);} );
+                d3.select(this).classed("label--selected", active);} );
 
     //inactivate all cells that are not selected
     svg.selectAll('.cell')
@@ -1098,8 +1134,6 @@ function update_d3Image(svg, dim, index) {
             } else {
                 var parent = current.node().parentNode;
                 idx = d3.select(parent).attr('row');
-                //reverse the ordering
-                idx = labs.size() - 1 - idx;
             }
 
             //check if the index is selected

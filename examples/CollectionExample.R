@@ -181,7 +181,7 @@ server <- function(input, output, session) {
                   trace = 'none')
     })
 
-    output$currentOutput <- renderPrint({ print(input$ScatterSelection) })
+    output$currentOutput <- renderPrint({ print(input$collection_callback) })
 
 }
 

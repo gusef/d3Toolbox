@@ -30,7 +30,18 @@
   stroke-width: 1.5px;
 }
 
+.link--selected {
+  stroke: #f00 !important;
+  stroke-width: 1.5px;
+}
+
+
 .label--active {
+  font-weight: bold;
+  color: #f00 !important;
+}
+
+.label--selected {
   font-weight: bold;
   color: #f00 !important;
 }

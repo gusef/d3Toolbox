@@ -11,6 +11,7 @@ d3Collection <- function(data,
                          lhei = rep.int(1, nrow(lmat)),
                          title = NULL,
                          connectors = NULL,
+                         callback = 'collection_callback',
                          width = NULL, height = NULL, margins = NULL,
                          elementId = NULL) {
 
@@ -80,7 +81,8 @@ d3Collection <- function(data,
         lhei = lhei,
         title = title,
         connectors = connectors,
-        margins=margins
+        callback = callback,
+        margins = margins
     )
 
     # create widget

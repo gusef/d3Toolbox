@@ -62,62 +62,39 @@ HTMLWidgets.widget({
             }
 
             for (var i = 0; i < collection.data.length; i++) {
-                var x = null, y = null, pwid = null, phei = null;
-                var current_x = 0, current_y = 0;
-                //go through lmat to figure out dimensions, allowing multiple rows / columns
-                 for (var j = 0; j < collection.lwid.length; j++) {
-                    for (var k = 0; k < collection.lhei.length; k++) {
-
-                        //only the subplot we are currently working on
-                        if (collection.lmat[k][j] === (i+1)){
-                            // if we have not encountered an element before
-                            if (x === null){
-                                x = current_x;
-                                y = current_y;
-                                pwid = width * collection.lwid[j];
-                                phei = height * collection.lhei[k];
-                            }else{
-                                // if we are in the same row
-                                if (x === current_x){
-                                    pwid += width * collection.lwid[j];
-                                }
-
-                                // if we are in the same column
-                                if (y === current_y){
-                                    phei += height * collection.lhei[k];
-                                }
-                            }
-                        }
-                        current_y += height * collection.lhei[k];
-                    }
-                    current_y = 0;
-                    current_x += width * collection.lwid[j];
-                }
-
+                //figure out where the subplot goes
+                var dims = getDimensions (collection, i, width, height);
 
                 var obj = collection.data[i];
 
                 //add a new group for each subplot
                 //and save it to the collection object so we can access it later
                 obj.sub_g = g.append("g")
-                             .attr("x", x)
-                             .attr("y", y)
-                             .attr("width", pwid)
-                             .attr("height", phei)
+                             .attr("x", dims.x)
+                             .attr("y", dims.y)
+                             .attr("width", dims.pwid)
+                             .attr("height", dims.phei)
                              .attr("transform",
-                                   "translate(" + x + "," + y + ")");
+                                   "translate(" + dims.x + "," + dims.y + ")");
+
+                //add a click box that when activated deselects everything
+                var that = this;
+                obj.sub_g.append('rect')
+                         .attr('class', 'click-capture')
+                         .style('opacity', 0)
+                         .attr('width', dims.pwid)
+                         .attr('height', dims.phei)
+                         .on("click", function(){that.update(that, i, '', [])});
 
                 // call the appropriate plot
                 var func = 'draw_' + obj.type;
-                window[func](obj.sub_g, obj, pwid, phei, this, i);
-
+                window[func](obj.sub_g, obj, dims.pwid, dims.phei, this, i);
             }
 
         },
 
         //function called when rows or columns from specific subplots are selected
         update : function(obj, id, axis, index){
-
             var con = obj.collection.connectors;
 
             //only if row/column connectors were specified
@@ -134,25 +111,73 @@ HTMLWidgets.widget({
                     window[func](sub.sub_g, '', []);
                 }
 
-
-                // then activate all active ones
-                for (var l = 0; l < active.length; l++){
-                    var idx = active[l];
-                    for (var k = 0; k < con[idx].names.length; k++ ){
-                        // -1 because of the R/javascript index differences
-                        sub = obj.collection.data[con[idx].names[k] - 1];
-                        func = 'update_' + sub.type;
-                        //run update with empty indices to deactivate all elements
-                        window[func](sub.sub_g, con[idx].dims[k], index);
+                if (active.length > 0){
+                    // then activate all active ones
+                    for (var l = 0; l < active.length; l++){
+                        var idx = active[l];
+                        for (var k = 0; k < con[idx].names.length; k++ ){
+                            // -1 because of the R/javascript index differences
+                            sub = obj.collection.data[con[idx].names[k] - 1];
+                            func = 'update_' + sub.type;
+                            //run update with empty indices to deactivate all elements
+                            window[func](sub.sub_g, con[idx].dims[k], index, sub);
+                        }
                     }
                 }
-
             }
+
+            console.log(typeof(index));
+            console.log(index);
+
+
+            //return values to shiny
+            Shiny.onInputChange(obj.collection.callback,
+                               {"plot_id" : id + 1,
+                                "plot_type" : obj.collection.data[id].type,
+                                "axis" : axis,
+                                "indices" : index});
         }
     };
   }
 });
 
+//helper function that figures out position and dimension of a subplot
+function getDimensions (collection, idx, width, height) {
+    var x = null, y = null, pwid = null, phei = null;
+    var current_x = 0, current_y = 0;
+    //go through lmat to figure out dimensions, allowing multiple rows / columns
+     for (var j = 0; j < collection.lwid.length; j++) {
+        for (var k = 0; k < collection.lhei.length; k++) {
+
+            //only the subplot we are currently working on
+            if (collection.lmat[k][j] === (idx + 1)){
+                // if we have not encountered an element before
+                if (x === null){
+                    x = current_x;
+                    y = current_y;
+                    pwid = width * collection.lwid[j];
+                    phei = height * collection.lhei[k];
+                }else{
+                    // if we are in the same row
+                    if (x === current_x){
+                        pwid += width * collection.lwid[j];
+                    }
+                    // if we are in the same column
+                    if (y === current_y){
+                        phei += height * collection.lhei[k];
+                       }
+                   }
+            }
+            current_y += height * collection.lhei[k];
+        }
+        current_y = 0;
+        current_x += width * collection.lwid[j];
+    }
+    return {"x" : x,
+            "y" : y,
+            "pwid" : pwid,
+            "phei" :phei };
+}
 
 //returns an array with all connectors
 function getConnectors(con, id, axis){
