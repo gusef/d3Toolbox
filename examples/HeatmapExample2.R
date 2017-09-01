@@ -15,7 +15,6 @@ ui <- fillPage(fillRow(
 
 server <- function(input, output, session) {
 
-
     output$heatmap <- renderd3Collection({
         #dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
         dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'

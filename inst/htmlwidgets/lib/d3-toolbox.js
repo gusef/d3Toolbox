@@ -247,7 +247,7 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
                 //if this was called by a collection
                 if (collection !== 'undefined'){
                     ret = collection.update(collection,id, 'value', i);
-                }else{
+                }else if (window.Shiny) {
                     ret = Shiny.onInputChange(param.callback, d.name);
                 }
                 return ret; });
@@ -295,7 +295,7 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
                 //if this was called by a collection
                 if (collection !== 'undefined'){
                     ret = collection.update(collection, id, 'value', i);
-                }else{
+                }else if (window.Shiny){
                     ret = Shiny.onInputChange(param.callback,
                                            {'x_value' : d.data.name,
                                             'y_value' : current});
@@ -445,7 +445,7 @@ function draw_d3Boxplot(svg, param, width, height, collection, id) {
             //if this was called by a collection
             if (collection !== 'undefined'){
                 ret = collection.update(collection, id, 'value', i);
-            }else{
+            } else if (window.Shiny){
                 ret = Shiny.onInputChange(param.callback, d.name);
             }
             return ret; });
@@ -495,9 +495,12 @@ function draw_d3Boxplot(svg, param, width, height, collection, id) {
          .style("fill", param.dotcol)
          .on('mouseover', dot_tip.show)
          .on('mouseout',  dot_tip.hide)
-         .on("click", function(d) { return Shiny.onInputChange(param.callback,
-                                                               {'name' : d.name,
-                                                                'x' : d.x}); });
+         .on("click", function(d) { if (window.Shiny) {
+                                        Shiny.onInputChange(param.callback,
+                                            {'name' : d.name,
+                                             'x' : d.x});
+                                    }
+            });
     }
 }
 
@@ -643,9 +646,11 @@ function draw_d3Scatter(svg, param, width, height, collection, id) {
              .classed("selected",true)
              .attr("r",param.dotsize * 2);
 
-        var ret = lasso.selectedItems();
-        Shiny.onInputChange(param.callback,
-                            ret.nodes().map(function(d) { return d.__data__.name; }) );
+        if (window.Shiny) {
+            var ret = lasso.selectedItems();
+            Shiny.onInputChange(param.callback,
+                                ret.nodes().map(function(d) { return d.__data__.name; }) );
+        }
 
         // Reset the style of the not selected dots
         lasso.notSelectedItems()
@@ -891,7 +896,7 @@ function draw_d3Dendrogram(svg, param, width, height, collection, id) {
                 }
                 collection.update(collection, id, 'value', indices.sort(sortNumber));
             //otherwise return to shiny
-            }else{
+            }else if (window.Shiny) {
                 Shiny.onInputChange(param.callback, labels);
             }
         };
@@ -904,18 +909,26 @@ function draw_d3Dendrogram(svg, param, width, height, collection, id) {
                 .attr("transform", function(d) { return "translate(" + getX(d) + "," + getY(d) + ")"; });
 
     if (param.label){
+
+        //check if the font size is too big
+        var font_size = param.horiz ? hei : wid;
+        font_size = font_size / param.label_text.length; 
+        font_size = param.lab_font_size < font_size ? param.lab_font_size : font_size;        
+        
         if (param.horiz) {
             node.append("text")
                 .each(function(d) { d.label = this; })
                 .attr("dy", 3)
                 .attr("x", 8)
                 .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+                .style("font-size", font_size)
                 .text(function(d) { return d.data.label; });
         } else {
             node.append("text")
                 .each(function(d) { d.label = this; })
                 .attr("transform","rotate(270 5,0)")
                 .style("text-anchor", "end" )
+                .style("font-size", font_size)
                 .text(function(d) { return d.data.label; });
         }
     }
@@ -1042,16 +1055,15 @@ function draw_d3Image(svg, param, width, height, collection, id) {
     // clicking a label
     function click(click_type) {
         return function(d, i) {
-                var ret;
-                //if this was called by a collection
-                if (collection !== 'undefined'){
-                    ret = collection.update(collection,id, click_type, [i]);
-                }else{
-                    ret = Shiny.onInputChange(param.callback,
-                                              {"type" : click_type,
-                                               "value" : d});
-                }
-                return ret;
+            var ret;
+            //if this was called by a collection
+            if (collection !== 'undefined'){
+                collection.update(collection,id, click_type, [i]);
+            }else if (window.Shiny){
+                Shiny.onInputChange(param.callback,
+                                    {"type" : click_type,
+                                     "value" : d});
+            }
         };
     }
 
