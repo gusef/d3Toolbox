@@ -63,8 +63,8 @@ server <- function(input, output, session) {
                   ColSideColors = topbar,
                   Rowv = left_dend,
                   Colv = top_dend,
+                  legend = leg,
                   main = 'Third d3Heatmap prototype')
-
     })
 
     output$filterpanel <- renderPlot({

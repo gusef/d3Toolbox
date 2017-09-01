@@ -1,8 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Legend
 function draw_d3Legend(svg, param, width, height, collection, id){
-     console.log(param);
-     
     //make a group to hold all 
     var g = svg.append("g")
     	       .attr("transform",
@@ -53,10 +51,6 @@ function draw_d3Legend(svg, param, width, height, collection, id){
              .attr("text-anchor", "start");
              
         y_offset += top + 2 * param.square + leg.legend.color.length * (param.square + 10);
-        
-        console.log("y_offset" + y_offset);
-        console.log("param.square" + param.square);
-        console.log("leg.legend.length" +  leg.legend.color.length);
     }
 }
 
@@ -76,7 +70,7 @@ function draw_d3Colorkey(svg, param, width, height, collection, id){
     var g = svg.append("g")
     	       .attr("transform", "translate(" + (width - wid)/2 + "," + (height - hei)/2 + ")");
 
-  // scales
+   //scales
     var x = d3.scaleLinear()
               .domain([Math.min.apply(null,param.hist.breaks),
                        Math.max.apply(null,param.hist.breaks)])

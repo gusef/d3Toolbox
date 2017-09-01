@@ -24,6 +24,11 @@ heatmap.d3 <- function(x,
                        key.subtitle = 'and Histogram',
                        key.xlab = 'Row z-score',
                        key.ylab = 'Count',
+                       legend = NULL,
+                       legend.colors = NULL, 
+                       legend.text = NULL, 
+                       legend.title = NULL,
+                       legend.width = 1,
                        symm = FALSE,
                        main = NULL,
                        xlab = NULL,
@@ -308,7 +313,7 @@ heatmap.d3 <- function(x,
             }
         }
     }
-
+    
     if (length(lhei) != nrow(lmat))
         stop("lhei must have length = nrow(lmat) = ", nrow(lmat))
     if (length(lwid) != ncol(lmat))
@@ -408,7 +413,27 @@ heatmap.d3 <- function(x,
         lmat[1,1] <- NA
     }
 
+    if (!is.null(legend) || !is.null(legend.colors) && !is.null(legend.text)){
+        #add to the layout
+        lmat <- cbind(lmat, 1 + max(lmat, na.rm = T))
+        lwid <- c(lwid, legend.width)
+        
+        #generate legend object
+        leg <- list(type = 'd3Legend')
+        
+        if (!is.null(legend)){
+            leg$leg_collect = legend
+        } else{
+            leg$colors = legend$colors
+            leg$text = legend$text
+            leg$title = legend$title
+        }
+        
+        data[[idx]] <- leg
+        idx <- idx + 1
+    }
 
+    
     d3Collection(data,
                  lmat=lmat,
                  lwid=lwid,
