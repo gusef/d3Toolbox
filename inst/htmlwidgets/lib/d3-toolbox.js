@@ -1122,18 +1122,16 @@ function update_d3Image(svg, dim, index, data) {
     var labs = svg.selectAll(sel);
     labs.each(function(d, i){
                 var active = false;
-                console.log(index);
-                console.log(i);
-                console.log(d);
-                //the column ordering is inverse
-                if (index.length > 0 && index.includes([i])){
-                    active = true;
+                for (var j = 0; j < index.length && !active; j++){
+                    if (index[j] === i){
+                        active = true;
+                    }
                 }
                 d3.select(this).classed("label--selected", active);} );
 
     //inactivate all cells that are not selected
-    svg.selectAll('.cell')
-       .each(function(d, i){
+    var y=svg.selectAll('.cell')
+    y.each(function(d, i){
             var inactivate = true;
             var current = d3.select(this);
             var idx;
@@ -1146,9 +1144,16 @@ function update_d3Image(svg, dim, index, data) {
                 idx = d3.select(parent).attr('row');
             }
 
+
             //check if the index is selected
-            if (index.length === 0 || index.includes(+idx)){
+             if (index.length === 0){
                 inactivate = false;
+            }
+            
+            for (var j = 0; j < index.length && inactivate; j++){
+                if (index[j] === +idx){
+                    inactivate = false;
+                }
             }
 
             //deactivate the non-selected cells

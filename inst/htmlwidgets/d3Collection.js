@@ -126,8 +126,8 @@ HTMLWidgets.widget({
                 }
             }
 
-            if (axis !== ''){
-               //return values to shiny
+            if (window.Shiny && axis !== ''){
+                
                 Shiny.onInputChange(obj.collection.callback,
                                {"plot_id" : id + 1,
                                 "plot_type" : obj.collection.data[id].type,

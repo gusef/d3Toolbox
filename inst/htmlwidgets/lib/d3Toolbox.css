@@ -31,7 +31,7 @@
 }
 
 .link--selected {
-  stroke: #f00 !important;
+  stroke: #00f !important;
   stroke-width: 1.5px;
 }
 

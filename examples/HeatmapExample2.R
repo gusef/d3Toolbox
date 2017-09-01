@@ -17,8 +17,8 @@ server <- function(input, output, session) {
 
 
     output$heatmap <- renderd3Collection({
-        dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
-        #dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'
+        #dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
+        dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'
 
         eSet <- readRDS(paste0(dir,'RNAseq_nodedup_cpm.RDS'))
         eSet <- eSet[,eSet$Visit.Code == "SCREEN"]
@@ -57,12 +57,11 @@ server <- function(input, output, session) {
                   Colv = top_dend,
                   main = 'Third d3Heatmap prototype')
 
-
     })
 
     output$filterpanel <- renderPlot({
-        dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
-        #dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'
+        #dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
+        dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'
 
         eSet <- readRDS(paste0(dir,'RNAseq_nodedup_cpm.RDS'))
         eSet <- eSet[,eSet$Visit.Code == "SCREEN"]
