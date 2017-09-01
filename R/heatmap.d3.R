@@ -34,7 +34,8 @@ heatmap.d3 <- function(x,
                        xlab = NULL,
                        ylab = NULL,
                        lhei = NULL,
-                       lwid = NULL){
+                       lwid = NULL,
+                       callback = 'heatmap_callback'){
 
     scale01 <- function(x, low = min(x), high = max(x)) {
         x <- (x - low)/(high - low)
@@ -432,13 +433,13 @@ heatmap.d3 <- function(x,
         data[[idx]] <- leg
         idx <- idx + 1
     }
-
     
     d3Collection(data,
-                 lmat=lmat,
-                 lwid=lwid,
-                 lhei=lhei,
-                 connectors=connectors,
-                 title=main)
+                 lmat = lmat,
+                 lwid = lwid,
+                 lhei = lhei,
+                 connectors = connectors,
+                 title = main,
+                 callback = callback)
 
 }

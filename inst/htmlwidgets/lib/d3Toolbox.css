@@ -1,5 +1,6 @@
 .cell--inactive {
     fill-opacity: 0.25 !important;
+    filter: alpha(opacity=40) !important; 
 }
 
 .node circle {

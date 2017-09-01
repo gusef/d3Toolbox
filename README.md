@@ -8,6 +8,35 @@ library(devtools)
 install_github("gusef/d3Toolbox")
 ```
 
+## Interactive heatmap
+
+![example](https://raw.github.com/gusef/d3Toolbox/master/resources/heatmap.gif)
+
+```{r heatmap, warning=FALSE, eval=FALSE}
+colors <- c('#1f78b4','#b2df8a','#33a02c','#fb9a99','#fdbf6f',
+            '#ff7f00','#cab2d6','#6a3d9a','#ffff99')
+                    
+x <- t(mtcars[,1:9])
+columns <- t(mtcars[10:11])
+colCols <- matrix(colors[columns],ncol=ncol(columns))
+rownames(colCols) <- rownames(columns)
+    
+leg <- list(list(colors = colors[unique(columns[1,])],
+                 text = unique(columns[1,]),
+                 title = rownames(columns)[1]),
+            list(colors = colors[unique(columns[2,])],
+                 text = unique(columns[2,]),
+                 title = rownames(columns)[2]))
+heatmap.d3(x,
+           scale='row',
+           ColSideColors = colCols,
+           legend = leg,
+           margins = c(150,20,20,80),
+           main = 'heatmap.d3')
+
+```
+
+
 ## Simple Scatterplot
 
 ![example](https://raw.github.com/gusef/d3Toolbox/master/resources/scatter.gif)

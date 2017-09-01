@@ -84,7 +84,7 @@ HTMLWidgets.widget({
                          .style('opacity', 0)
                          .attr('width', dims.pwid)
                          .attr('height', dims.phei)
-                         .on("click", function(){that.update(that, i, '', [])});
+                         .on("click", function(){that.update(that, i, '', [], true)});
 
                 // call the appropriate plot
                 var func = 'draw_' + obj.type;
@@ -94,7 +94,7 @@ HTMLWidgets.widget({
         },
 
         //function called when rows or columns from specific subplots are selected
-        update : function(obj, id, axis, index){
+        update : function(obj, id, axis, index, clear_old){
             var con = obj.collection.connectors;
 
             //only if row/column connectors were specified
@@ -102,15 +102,17 @@ HTMLWidgets.widget({
 
                 //figure out which one of the connectors is active and inactive
                 var active = getConnectors(con, id, axis);
-
                 var sub, func;
-                // then deactivate all inactive ones
-                for (var m = 0; m < obj.collection.data.length; m++){
-                    sub = obj.collection.data[m];
-                    func = 'update_' + sub.type;
-                    window[func](sub.sub_g, '', []);
+                if (clear_old){
+                    // then deactivate all 
+                    for (var m = 0; m < obj.collection.data.length; m++){
+                        sub = obj.collection.data[m];
+                        func = 'update_' + sub.type;
+                        window[func](sub.sub_g, '', [], clear_old);
+                    }
                 }
-
+                
+                //only if there are connections
                 if (active.length > 0){
                     // then activate all active ones
                     for (var l = 0; l < active.length; l++){
@@ -119,8 +121,9 @@ HTMLWidgets.widget({
                             // -1 because of the R/javascript index differences
                             sub = obj.collection.data[con[idx].names[k] - 1];
                             func = 'update_' + sub.type;
+                        
                             //run update with empty indices to deactivate all elements
-                            window[func](sub.sub_g, con[idx].dims[k], index, sub);
+                            window[func](sub.sub_g, con[idx].dims[k], index, clear_old);
                         }
                     }
                 }
