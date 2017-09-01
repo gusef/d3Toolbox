@@ -1,43 +1,63 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Legend
 function draw_d3Legend(svg, param, width, height, collection, id){
-    var top = param.title === null ? 0 : 10;
-
+     console.log(param);
+     
+    //make a group to hold all 
     var g = svg.append("g")
     	       .attr("transform",
-    	             "translate(" + param.margins.left + "," + (param.margins.top + top) + ")");
+    	             "translate(" + param.margins.left + "," + (param.margins.top) + ")");
 
-    if (param.title !== null){
-        svg.append("text")
-           .attr("text-anchor", "start")
-           .attr("transform", "translate("+ 15 +","+ 15 + ")")
-           .attr("font-size", param.fontsize)
-           .attr("font-weight", "bold")
-           .text(param.title);
+    //then add one after another
+    var top, leg, y_offset = 0; 
+    for (var i = 0; i < param.legends.length; i++){
+        
+        leg = param.legends[[i]];
+    
+        top = leg.title === null ? 0 : 10;
+    
+        sub_g = g.append("g")
+                 .attr("y", y_offset)
+                 .attr("transform",
+                       "translate( 0," + (y_offset + top) + ")");
+    
+        if (param.title !== null){
+            svg.append("text")
+               .attr("text-anchor", "start")
+               .attr("transform", "translate("+ 15 +","+ (y_offset + 15)  + ")")
+               .attr("font-size", param.fontsize)
+               .attr("font-weight", "bold")
+               .text(leg.title);
+        }
+    
+        var d3data = HTMLWidgets.dataframeToD3(leg.legend);
+    
+        sub_g.selectAll(".legend")
+             .data(d3data)
+             .enter().append("rect")
+             .attr("class", "legend")
+             .attr("x", 5)
+             .attr("y", function(d,i) { return i * (param.square + 10); })
+             .attr("width", param.square)
+             .attr("height", param.square)
+             .attr("fill", function(d, i) { return d.color; });
+    
+        sub_g.selectAll(".legtext")
+             .data(d3data)
+             .enter().append("text")
+             .attr("class", "legtext")
+             .text(function(d){ return d.text; })
+             .attr("font-size", param.fontsize)
+             .attr("x", param.square + 10)
+             .attr("y", function(d,i) { return  2+ param.square/2 + i * (param.square + 10); })
+             .attr("text-anchor", "start");
+             
+        y_offset += top + 2 * param.square + leg.legend.color.length * (param.square + 10);
+        
+        console.log("y_offset" + y_offset);
+        console.log("param.square" + param.square);
+        console.log("leg.legend.length" +  leg.legend.color.length);
     }
-
-    var d3data = HTMLWidgets.dataframeToD3(param.legend);
-
-    g.selectAll(".legend")
-      .data(d3data)
-      .enter().append("rect")
-      .attr("class", "legend")
-      .attr("x", 5)
-      .attr("y", function(d,i) { return i * (param.square + 10); })
-      .attr("width", param.square)
-      .attr("height", param.square)
-      .attr("fill", function(d, i) { return d.color; });
-
-    g.selectAll(".legtext")
-      .data(d3data)
-      .enter().append("text")
-       .attr("class", "legtext")
-       .text(function(d){ return d.text; })
-       .attr("font-size", param.fontsize)
-       .attr("x", param.square + 10)
-       .attr("y", function(d,i) { return  2+ param.square/2 + i * (param.square + 10); })
-       .attr("text-anchor", "start");
-
 }
 
 function update_d3Legend(obj, dim, index) {

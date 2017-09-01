@@ -127,7 +127,6 @@ HTMLWidgets.widget({
             }
 
             if (window.Shiny && axis !== ''){
-                
                 Shiny.onInputChange(obj.collection.callback,
                                {"plot_id" : id + 1,
                                 "plot_type" : obj.collection.data[id].type,
@@ -146,7 +145,6 @@ function getDimensions (collection, idx, width, height) {
     //go through lmat to figure out dimensions, allowing multiple rows / columns
      for (var j = 0; j < collection.lwid.length; j++) {
         for (var k = 0; k < collection.lhei.length; k++) {
-
             //only the subplot we are currently working on
             if (collection.lmat[k][j] === (idx + 1)){
                 // if we have not encountered an element before
@@ -163,8 +161,8 @@ function getDimensions (collection, idx, width, height) {
                     // if we are in the same column
                     if (y === current_y){
                         phei += height * collection.lhei[k];
-                       }
-                   }
+                    }
+                }
             }
             current_y += height * collection.lhei[k];
         }

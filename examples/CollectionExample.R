@@ -10,13 +10,13 @@ ui <- fillPage(fillRow(
     plotOutput("filterpanel", width = "100%", height = "100%")
   ),flex = c(2,1))
   ,tags$head(tags$script(src="d3-toolbox.js"))
-  ,tags$head(tags$script(src="d3Collection.js"))
+  #,tags$head(tags$script(src="d3Collection.js"))
 )
 
 
 readeSet <- function(){
-    dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
-    #dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'
+    #dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
+    dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'
 
     eSet <- readRDS(paste0(dir,'RNAseq_nodedup_cpm.RDS'))
     eSet <- eSet[,eSet$Visit.Code == "SCREEN"]
@@ -114,11 +114,15 @@ readeSet <- function(){
                                    left = 0))
 
     #legend
+    cols <- c('#2ca25f','#f03b20','#99d8c9','#ffeda0')
+    leg <- list(BOR = list(colors = cols[c(1,3,4,2)],
+                           text = levels(eSet$BORI)[c(1,3,4,2)],
+                           title = 'BORI'),
+                RESW13 = list(colors = cols[c(3,4,2)],
+                              text = levels(eSet$BORI)[c(3,4,2)],
+                              title = 'RESW13'))
     data[[6]] <- list(type = 'd3Legend',
-                      colors = c('#2ca25f','#f03b20','#99d8c9','#ffeda0')[c(1,3,4,2)],
-                      text = levels(eSet$BORI)[c(1,3,4,2)],
-                      title = 'RECIST')
-
+                      leg_collect = leg)
     return(data)
 }
 
@@ -146,8 +150,8 @@ server <- function(input, output, session) {
     })
 
     output$filterpanel <- renderPlot({
-        dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
-        #dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'
+        #dir <- '/Users/Daniel Gusenleitner/Dropbox (Personal)/Hephaestus/data/'
+        dir <- '/Users/gusef/Dropbox (Personal)/Hephaestus/data/'
 
         eSet <- readRDS(paste0(dir,'RNAseq_nodedup_cpm.RDS'))
         eSet <- eSet[,eSet$Visit.Code == "SCREEN"]

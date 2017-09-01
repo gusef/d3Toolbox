@@ -48,6 +48,15 @@ server <- function(input, output, session) {
         colnames(topbar) <- colnames(eSet)
         rownames(topbar) <- c('BORI','RESW13I')
 
+        #legend
+        cols <- c('#2ca25f','#f03b20','#99d8c9','#ffeda0')
+        leg <- list(BOR = list(colors = cols[c(1,3,4,2)],
+                               text = levels(eSet$BORI)[c(1,3,4,2)],
+                               title = 'BORI'),
+                    RESW13 = list(colors = cols[c(3,4,2)],
+                                  text = levels(eSet$BORI)[c(3,4,2)],
+                                  title = 'RESW13'))
+        
         heatmap.d3(x = exprs(eSet),
                   scale='row',
                   col = RColorBrewer::brewer.pal(11,"RdBu")[11:1],
