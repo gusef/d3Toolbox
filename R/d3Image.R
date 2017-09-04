@@ -5,10 +5,11 @@
 #' @import htmlwidgets
 #'
 #' @export
-d3Image <- function(data, xlab = '', ylab = '', raw_values = NULL,
-                    show_xlabs = !is.null(colnames(data)),
+d3Image <- function(data, xlab = rownames(data), ylab = colnames(data), 
+                    raw_values = NULL, show_xlabs = !is.null(colnames(data)),
                     show_ylabs = !is.null(rownames(data)),
                     allow_NA = FALSE, lab_font_size = 12,
+                    xlab_text = NULL, ylab_text = NULL,
                     title = NULL, subtitle = NULL, callback='ImageSelection',
                     width = NULL, height = NULL, margins = NULL,
                     col_scale = RColorBrewer::brewer.pal(11,"RdBu")[11:1],
@@ -74,6 +75,8 @@ d3Image <- function(data, xlab = '', ylab = '', raw_values = NULL,
         yax = yax,
         show_xax = show_xlabs,
         show_yax = show_ylabs,
+        xlab_text = xlab_text,
+        ylab_text = ylab_text,
         lab_font_size = lab_font_size,
         title = title,
         subtitle = subtitle,

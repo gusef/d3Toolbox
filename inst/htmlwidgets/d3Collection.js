@@ -64,8 +64,10 @@ HTMLWidgets.widget({
             for (var i = 0; i < collection.data.length; i++) {
                 //figure out where the subplot goes
                 var dims = getDimensions (collection, i, width, height);
-
                 var obj = collection.data[i];
+                
+                //set the callback to the heatmap callback
+                obj.callback = collection.callback;
 
                 //add a new group for each subplot
                 //and save it to the collection object so we can access it later
@@ -127,14 +129,6 @@ HTMLWidgets.widget({
                         }
                     }
                 }
-            }
-
-            if (window.Shiny && axis !== ''){
-                Shiny.onInputChange(obj.collection.callback,
-                               {"plot_id" : id + 1,
-                                "plot_type" : obj.collection.data[id].type,
-                                "axis" : axis,
-                                "indices" : index});
             }
         }
     };

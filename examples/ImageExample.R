@@ -5,13 +5,13 @@ require(d3Toolbox)
 
 ui <- fillPage(fillRow(
   #multi-panel
-    d3ImageOutput("tSNE_panel", width = "100%", height = "100%"),
+    d3ImageOutput("image_test", width = "100%", height = "100%"),
   fillCol(
     h3(verbatimTextOutput("currentOutput")),
     d3ImageOutput("filterpanel", width = "100%", height = "100%"),
     d3ScatterOutput("lowdimpanel", width = "100%", height = "100%")
   ),flex = c(2,1))
-  #,tags$head(tags$script(src="D3Image.js"))
+  ,tags$head(tags$script(src="d3-toolbox.js"))
 )
 
 server <- function(input, output, session) {
@@ -39,14 +39,13 @@ server <- function(input, output, session) {
 
     output$filterpanel <- renderd3Image({
         mat <- matrix(rainbow(20),nrow=2)
-
         d3Image(mat,
                 raw_values=NULL,
                 show_xlabs = F,
                 show_ylabs = F)
     })
 
-    output$tSNE_panel <- renderd3Image({
+    output$image_test <- renderd3Image({
         x <- t(mtcars)
         rm <- rowMeans(x, na.rm = F)
         x <- sweep(x, 1, rm)
@@ -55,12 +54,12 @@ server <- function(input, output, session) {
 
         d3Image(data=x,
                 raw_values=t(mtcars),
-                xlab='Cars',
-                ylab='Features',
                 margins=list(top = 40,
                              right = 80,
                              bottom = 150,
                              left = 60),
+                xlab_text='Cars',
+                ylab_text='Features',
                 show_xlabs=T,
                 show_ylabs=T,
                 title='Motor Trend Car Road Tests',

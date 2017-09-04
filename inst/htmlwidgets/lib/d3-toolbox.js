@@ -257,14 +257,15 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
          .on('mouseover', (param.tooltip) ? tool_tip.show : null)
          .on('mouseout',  (param.tooltip) ? tool_tip.hide : null)
          .on("click", function(d, i) {
-                var ret;
                 //if this was called by a collection
                 if (collection !== 'undefined'){
                     ret = collection.update(collection,id, 'value', i, true);
-                }else if (window.Shiny) {
-                    ret = Shiny.onInputChange(param.callback, d.name);
                 }
-                return ret; });
+                //if we run this within shiny
+                if (window.Shiny) {
+                   Shiny.onInputChange(param.callback, d.name);
+                }
+            });
 
    } else {
         tool_tip.html(function(d) {
@@ -305,18 +306,18 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
                     }
                 });
 
-                var ret;
                 //if this was called by a collection
                 if (collection !== 'undefined'){
-                    ret = collection.update(collection, id, 'value', i, true);
-                }else if (window.Shiny){
-                    ret = Shiny.onInputChange(param.callback,
-                                           {'x_value' : d.data.name,
-                                            'y_value' : current});
+                    collection.update(collection, id, 'value', i, true);
                 }
-                return ret;
+                
+                //if we run this through Shiny
+                if (window.Shiny){
+                    Shiny.onInputChange(param.callback,
+                                       {'x_value' : d.data.name,
+                                        'y_value' : current});
+                }
             });
-
     }
 }
 
@@ -455,14 +456,15 @@ function draw_d3Boxplot(svg, param, width, height, collection, id) {
      .on('mouseover', tool_tip.show)
      .on('mouseout', tool_tip.hide)
      .on("click", function(d, i) {
-            var ret;
             //if this was called by a collection
             if (collection !== 'undefined'){
                 ret = collection.update(collection, id, 'value', i, true);
-            } else if (window.Shiny){
-                ret = Shiny.onInputChange(param.callback, d.name);
             }
-            return ret; });
+            //if we run this through Shiny
+            if (window.Shiny){
+                Shiny.onInputChange(param.callback, d.name);
+            }
+        });
 
     // Add median line
     g.selectAll("line.median")
@@ -909,8 +911,9 @@ function draw_d3Dendrogram(svg, param, width, height, collection, id) {
                     return a - b;
                 }
                 collection.update(collection, id, 'value', indices.sort(sortNumber), true);
-            //otherwise return to shiny
-            }else if (window.Shiny) {
+            }
+            //if we run this through Shiny
+            if (window.Shiny) {
                 Shiny.onInputChange(param.callback, labels);
             }
         };
@@ -1036,15 +1039,21 @@ function draw_d3Image(svg, param, width, height, collection, id) {
                        .on("mouseout", mouseov(false));
     }
 
+    // now add title to the x axis
+    if (param.xlab_text !== null){
+        svg.append("text")
+           .attr("text-anchor", "middle")
+           .attr("transform", "translate("+ (width/2) +","+(height-10)+")")
+           .text(param.xlab_text);        
+    }
+
     var ylab = d3.scaleBand()
                  .domain(param.yax)
                  .range([hei, 0]);
 
     //show the labels on the right
     if (param.show_yax){
-
         font_size = param.lab_font_size < ylab.bandwidth() ?  param.lab_font_size : ylab.bandwidth();
-
         var ylabels = g.selectAll(".ylab")
                        .data(param.yax)
                        .enter().append("text")
@@ -1057,6 +1066,14 @@ function draw_d3Image(svg, param, width, height, collection, id) {
                        .on("click", click("row"))
                        .on("mouseover", mouseov(true))
                        .on("mouseout", mouseov(false));
+    }
+
+    // now add title to the y axis
+    if (param.ylab_text !== null){
+        svg.append("text")
+           .attr("text-anchor", "middle")
+           .attr("transform", "translate(" + (width-10) + "," + (height/2)+")rotate(-90)")
+           .text(param.ylab_text);        
     }
 
     // highlighting with mouseover
@@ -1072,7 +1089,10 @@ function draw_d3Image(svg, param, width, height, collection, id) {
             //if this was called by a collection
             if (collection !== 'undefined'){
                 collection.update(collection,id, click_type, [i], true);
-            }else if (window.Shiny){
+            //if the image was called directly
+            } 
+            //if we run this through Shiny
+            if (window.Shiny){
                 Shiny.onInputChange(param.callback,
                                     {"type" : click_type,
                                      "value" : d});
@@ -1139,6 +1159,7 @@ function draw_d3Image(svg, param, width, height, collection, id) {
     }
     
     //add a brush that can select all cells in an image
+    //deactivated for now since it over-writes the tooltips
  /*   svg.append("g")
     .attr("class", "brush")
     .call(d3.brush()
@@ -1183,7 +1204,10 @@ function draw_d3Image(svg, param, width, height, collection, id) {
             collection.update(collection,id, 'column', x_coords, true);
             collection.update(collection,id, 'row', y_coords, false);
             
-        }else if (window.Shiny){
+        }
+        
+        //if we run this through shiny
+        if (window.Shiny){
             //snap into the selected cells
             d3.select(this).transition().call(d3.event.target.move, [start, end]);
             Shiny.onInputChange(param.callback,
