@@ -1,46 +1,60 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Legend
 function draw_d3Legend(svg, param, width, height, collection, id){
-    var top = param.title === null ? 0 : 10;
-
+    //make a group to hold all 
     var g = svg.append("g")
     	       .attr("transform",
-    	             "translate(" + param.margins.left + "," + (param.margins.top + top) + ")");
+    	             "translate(" + param.margins.left + "," + (param.margins.top) + ")");
 
-    if (param.title !== null){
-        svg.append("text")
-           .attr("text-anchor", "start")
-           .attr("transform", "translate("+ 15 +","+ 15 + ")")
-           .attr("font-size", param.fontsize)
-           .attr("font-weight", "bold")
-           .text(param.title);
+    //then add one after another
+    var top, leg, y_offset = 0; 
+    for (var i = 0; i < param.legends.length; i++){
+        
+        leg = param.legends[[i]];
+    
+        top = leg.title === null ? 0 : 10;
+    
+        sub_g = g.append("g")
+                 .attr("y", y_offset)
+                 .attr("transform",
+                       "translate( 0," + (y_offset + top) + ")");
+    
+        if (param.title !== null){
+            svg.append("text")
+               .attr("text-anchor", "start")
+               .attr("transform", "translate("+ 15 +","+ (y_offset + 15)  + ")")
+               .attr("font-size", param.fontsize)
+               .attr("font-weight", "bold")
+               .text(leg.title);
+        }
+    
+        var d3data = HTMLWidgets.dataframeToD3(leg.legend);
+    
+        sub_g.selectAll(".legend")
+             .data(d3data)
+             .enter().append("rect")
+             .attr("class", "legend")
+             .attr("x", 5)
+             .attr("y", function(d,i) { return i * (param.square + 10); })
+             .attr("width", param.square)
+             .attr("height", param.square)
+             .attr("fill", function(d, i) { return d.color; });
+    
+        sub_g.selectAll(".legtext")
+             .data(d3data)
+             .enter().append("text")
+             .attr("class", "legtext")
+             .text(function(d){ return d.text; })
+             .attr("font-size", param.fontsize)
+             .attr("x", param.square + 10)
+             .attr("y", function(d,i) { return  2+ param.square/2 + i * (param.square + 10); })
+             .attr("text-anchor", "start");
+             
+        y_offset += top + 2 * param.square + leg.legend.color.length * (param.square + 10);
     }
-
-    var d3data = HTMLWidgets.dataframeToD3(param.legend);
-
-    g.selectAll(".legend")
-      .data(d3data)
-      .enter().append("rect")
-      .attr("class", "legend")
-      .attr("x", 5)
-      .attr("y", function(d,i) { return i * (param.square + 10); })
-      .attr("width", param.square)
-      .attr("height", param.square)
-      .attr("fill", function(d, i) { return d.color; });
-
-    g.selectAll(".legtext")
-      .data(d3data)
-      .enter().append("text")
-       .attr("class", "legtext")
-       .text(function(d){ return d.text; })
-       .attr("font-size", param.fontsize)
-       .attr("x", param.square + 10)
-       .attr("y", function(d,i) { return  2+ param.square/2 + i * (param.square + 10); })
-       .attr("text-anchor", "start");
-
 }
 
-function update_d3Legend(obj, dim, index) {
+function update_d3Legend(obj, dim, index, clear_old) {
 
 
 }
@@ -56,7 +70,7 @@ function draw_d3Colorkey(svg, param, width, height, collection, id){
     var g = svg.append("g")
     	       .attr("transform", "translate(" + (width - wid)/2 + "," + (height - hei)/2 + ")");
 
-  // scales
+   //scales
     var x = d3.scaleLinear()
               .domain([Math.min.apply(null,param.hist.breaks),
                        Math.max.apply(null,param.hist.breaks)])
@@ -144,7 +158,7 @@ function draw_d3Colorkey(svg, param, width, height, collection, id){
      .attr("stroke", "Aqua");
 }
 
-function update_d3Colorkey(obj, dim, index) {
+function update_d3Colorkey(obj, dim, index, clear_old) {
 
 }
 
@@ -243,14 +257,15 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
          .on('mouseover', (param.tooltip) ? tool_tip.show : null)
          .on('mouseout',  (param.tooltip) ? tool_tip.hide : null)
          .on("click", function(d, i) {
-                var ret;
                 //if this was called by a collection
                 if (collection !== 'undefined'){
-                    ret = collection.update(collection,id, 'value', i);
-                }else{
-                    ret = Shiny.onInputChange(param.callback, d.name);
+                    ret = collection.update(collection,id, 'value', i, true);
                 }
-                return ret; });
+                //if we run this within shiny
+                if (window.Shiny) {
+                   Shiny.onInputChange(param.callback, d.name);
+                }
+            });
 
    } else {
         tool_tip.html(function(d) {
@@ -291,22 +306,22 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
                     }
                 });
 
-                var ret;
                 //if this was called by a collection
                 if (collection !== 'undefined'){
-                    ret = collection.update(collection, id, 'value', i);
-                }else{
-                    ret = Shiny.onInputChange(param.callback,
-                                           {'x_value' : d.data.name,
-                                            'y_value' : current});
+                    collection.update(collection, id, 'value', i, true);
                 }
-                return ret;
+                
+                //if we run this through Shiny
+                if (window.Shiny){
+                    Shiny.onInputChange(param.callback,
+                                       {'x_value' : d.data.name,
+                                        'y_value' : current});
+                }
             });
-
     }
 }
 
-function update_d3Barplot(obj, dim, index) {
+function update_d3Barplot(obj, dim, index, clear_old) {
 
 }
 
@@ -441,14 +456,15 @@ function draw_d3Boxplot(svg, param, width, height, collection, id) {
      .on('mouseover', tool_tip.show)
      .on('mouseout', tool_tip.hide)
      .on("click", function(d, i) {
-            var ret;
             //if this was called by a collection
             if (collection !== 'undefined'){
-                ret = collection.update(collection, id, 'value', i);
-            }else{
-                ret = Shiny.onInputChange(param.callback, d.name);
+                ret = collection.update(collection, id, 'value', i, true);
             }
-            return ret; });
+            //if we run this through Shiny
+            if (window.Shiny){
+                Shiny.onInputChange(param.callback, d.name);
+            }
+        });
 
     // Add median line
     g.selectAll("line.median")
@@ -495,13 +511,16 @@ function draw_d3Boxplot(svg, param, width, height, collection, id) {
          .style("fill", param.dotcol)
          .on('mouseover', dot_tip.show)
          .on('mouseout',  dot_tip.hide)
-         .on("click", function(d) { return Shiny.onInputChange(param.callback,
-                                                               {'name' : d.name,
-                                                                'x' : d.x}); });
+         .on("click", function(d) { if (window.Shiny) {
+                                        Shiny.onInputChange(param.callback,
+                                            {'name' : d.name,
+                                             'x' : d.x});
+                                    }
+            });
     }
 }
 
-function update_d3Boxplot(obj, dim, index) {
+function update_d3Boxplot(obj, dim, index, clear_old) {
 
 }
 
@@ -643,9 +662,11 @@ function draw_d3Scatter(svg, param, width, height, collection, id) {
              .classed("selected",true)
              .attr("r",param.dotsize * 2);
 
-        var ret = lasso.selectedItems();
-        Shiny.onInputChange(param.callback,
-                            ret.nodes().map(function(d) { return d.__data__.name; }) );
+        if (window.Shiny) {
+            var ret = lasso.selectedItems();
+            Shiny.onInputChange(param.callback,
+                                ret.nodes().map(function(d) { return d.__data__.name; }) );
+        }
 
         // Reset the style of the not selected dots
         lasso.notSelectedItems()
@@ -690,7 +711,7 @@ function draw_d3Scatter(svg, param, width, height, collection, id) {
     }
 }
 
-function update_d3Scatter(obj, dim, index) {
+function update_d3Scatter(obj, dim, index, clear_old) {
 
 }
 
@@ -889,9 +910,10 @@ function draw_d3Dendrogram(svg, param, width, height, collection, id) {
                 function sortNumber(a,b) {
                     return a - b;
                 }
-                collection.update(collection, id, 'value', indices.sort(sortNumber));
-            //otherwise return to shiny
-            }else{
+                collection.update(collection, id, 'value', indices.sort(sortNumber), true);
+            }
+            //if we run this through Shiny
+            if (window.Shiny) {
                 Shiny.onInputChange(param.callback, labels);
             }
         };
@@ -904,24 +926,32 @@ function draw_d3Dendrogram(svg, param, width, height, collection, id) {
                 .attr("transform", function(d) { return "translate(" + getX(d) + "," + getY(d) + ")"; });
 
     if (param.label){
+
+        //check if the font size is too big
+        var font_size = param.horiz ? hei : wid;
+        font_size = font_size / param.label_text.length; 
+        font_size = param.lab_font_size < font_size ? param.lab_font_size : font_size;        
+        
         if (param.horiz) {
             node.append("text")
                 .each(function(d) { d.label = this; })
                 .attr("dy", 3)
                 .attr("x", 8)
                 .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+                .style("font-size", font_size)
                 .text(function(d) { return d.data.label; });
         } else {
             node.append("text")
                 .each(function(d) { d.label = this; })
                 .attr("transform","rotate(270 5,0)")
                 .style("text-anchor", "end" )
+                .style("font-size", font_size)
                 .text(function(d) { return d.data.label; });
         }
     }
 }
 
-function update_d3Dendrogram(svg, dim, index, data) {
+function update_d3Dendrogram(svg, dim, index, clear_old) {
 
     //inactivate all cells that are not selected
     svg.selectAll('.g_dend')
@@ -1009,27 +1039,41 @@ function draw_d3Image(svg, param, width, height, collection, id) {
                        .on("mouseout", mouseov(false));
     }
 
+    // now add title to the x axis
+    if (param.xlab_text !== null){
+        svg.append("text")
+           .attr("text-anchor", "middle")
+           .attr("transform", "translate("+ (width/2) +","+(height-10)+")")
+           .text(param.xlab_text);        
+    }
+
     var ylab = d3.scaleBand()
                  .domain(param.yax)
                  .range([hei, 0]);
 
     //show the labels on the right
     if (param.show_yax){
-
         font_size = param.lab_font_size < ylab.bandwidth() ?  param.lab_font_size : ylab.bandwidth();
-
         var ylabels = g.selectAll(".ylab")
                        .data(param.yax)
                        .enter().append("text")
                        .attr("class", "ylab selectlabel")
                        .text(function (d) { return d; })
                        .attr("x", wid + 3)
-                       .attr("y", function(d) { return ylab(d)  + 0.8 * ylab.bandwidth(); })
+                       .attr("y", function(d) { return ylab(d)  + 0.5 * ylab.bandwidth(); })
                        .style("text-anchor", "start")
                        .style("font-size", font_size)
                        .on("click", click("row"))
                        .on("mouseover", mouseov(true))
                        .on("mouseout", mouseov(false));
+    }
+
+    // now add title to the y axis
+    if (param.ylab_text !== null){
+        svg.append("text")
+           .attr("text-anchor", "middle")
+           .attr("transform", "translate(" + (width-10) + "," + (height/2)+")rotate(-90)")
+           .text(param.ylab_text);        
     }
 
     // highlighting with mouseover
@@ -1042,16 +1086,17 @@ function draw_d3Image(svg, param, width, height, collection, id) {
     // clicking a label
     function click(click_type) {
         return function(d, i) {
-                var ret;
-                //if this was called by a collection
-                if (collection !== 'undefined'){
-                    ret = collection.update(collection,id, click_type, [i]);
-                }else{
-                    ret = Shiny.onInputChange(param.callback,
-                                              {"type" : click_type,
-                                               "value" : d});
-                }
-                return ret;
+            //if this was called by a collection
+            if (collection !== 'undefined'){
+                collection.update(collection,id, click_type, [i], true);
+            //if the image was called directly
+            } 
+            //if we run this through Shiny
+            if (window.Shiny){
+                Shiny.onInputChange(param.callback,
+                                    {"type" : click_type,
+                                     "value" : d});
+            }
         };
     }
 
@@ -1112,29 +1157,100 @@ function draw_d3Image(svg, param, width, height, collection, id) {
         cell.on('mouseover', tool_tip.show)
             .on('mouseout',  tool_tip.hide);
     }
+    
+    //add a brush that can select all cells in an image
+    //deactivated for now since it over-writes the tooltips
+ /*   svg.append("g")
+    .attr("class", "brush")
+    .call(d3.brush()
+        .extent([[0, 0], [wid, hei]])
+        .on("end", brushended));
+   */     
+    function brushended() {
+        if (!d3.event.sourceEvent) return; // Only transition after input.
+        if (!d3.event.selection) return; // Ignore empty selections.
+   
+        //get the index    
+        var start = d3.event.selection[0];
+        var end = d3.event.selection[1];
+        var x_coords = [start[0],end[0]];
+        var y_coords = [start[1],end[1]];
+        x_coords = x_coords.map(function(d){ return d / x.bandwidth(); });
+        y_coords = y_coords.map(function(d){ return d / y.bandwidth(); });
+
+        //snap to the next cell
+        x_coords[0] = Math.floor(x_coords[0]);
+        x_coords[1] = Math.ceil(x_coords[1]);
+        y_coords[0] = Math.floor(y_coords[0]);
+        y_coords[1] = Math.ceil(y_coords[1]);
+
+        //get the snapped coordinates
+        start = [x_coords[0] * x.bandwidth(),
+                 y_coords[0] * y.bandwidth()];
+                 
+        end = [x_coords[1] * x.bandwidth(),
+               y_coords[1] * y.bandwidth()];
+               
+        //reverse the y coordinates
+        y_coords = y_coords.map(function(d){ return data.length - d;});
+
+        //transform into ranges
+        x_coords = d3.range(x_coords[0],x_coords[1]);  
+        y_coords = d3.range(y_coords[1],y_coords[0]);  
+
+        //if this was called by a collection
+        if (collection !== 'undefined'){
+            d3.select(this).transition().call(d3.event.target.move, [start,start]);
+            collection.update(collection,id, 'column', x_coords, true);
+            collection.update(collection,id, 'row', y_coords, false);
+            
+        }
+        
+        //if we run this through shiny
+        if (window.Shiny){
+            //snap into the selected cells
+            d3.select(this).transition().call(d3.event.target.move, [start, end]);
+            Shiny.onInputChange(param.callback,
+                                {"type" : 'cell_select',
+                                 "x_coords" : x_coords,
+                                 "y_coords" : y_coords
+                                });
+        }
+    }
 }
 
-function update_d3Image(svg, dim, index, data) {
-
+function update_d3Image(svg, dim, index, clear_old) {
+    
     // highlight the labels
     var sel = dim === 'row' ? '.ylab' : '.selectlabel';
     sel = dim === 'column' ? '.xlab' : sel;
     var labs = svg.selectAll(sel);
     labs.each(function(d, i){
-                var active = false;
-                console.log(index);
-                console.log(i);
-                console.log(d);
-                //the column ordering is inverse
-                if (index.length > 0 && index.includes([i])){
-                    active = true;
-                }
-                d3.select(this).classed("label--selected", active);} );
+        
+        // if clear_is true overwrite the active labels, if not use the old activation
+        if (!clear_old){
+            console.log(index);
+        }
+       
+        //var active =  clear_old ? false : d3.select(this).classed("label--selected");
+        var active = false;
+
+        for (var j = 0; j < index.length && !active; j++){
+            if (index[j] === i){
+                active = true;
+            }
+        }
+        
+        
+        d3.select(this).classed("label--selected", active);} );
 
     //inactivate all cells that are not selected
-    svg.selectAll('.cell')
-       .each(function(d, i){
-            var inactivate = true;
+    var y=svg.selectAll('.cell')
+    y.each(function(d, i){
+            
+        // if clear_is true overwrite the active labels, if not use the old activation
+        var inactivate = clear_old ? true : d3.select(this).classed("cell--inactive");
+
             var current = d3.select(this);
             var idx;
 
@@ -1147,8 +1263,14 @@ function update_d3Image(svg, dim, index, data) {
             }
 
             //check if the index is selected
-            if (index.length === 0 || index.includes(+idx)){
+             if (index.length === 0){
                 inactivate = false;
+            }
+            
+            for (var j = 0; j < index.length && inactivate; j++){
+                if (index[j] === +idx){
+                    inactivate = false;
+                }
             }
 
             //deactivate the non-selected cells

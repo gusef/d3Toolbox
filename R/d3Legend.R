@@ -1,3 +1,15 @@
+#helper function 
+formalize_legend <- function (colors, text, title){    
+    #Fix the coloring
+    colors <- gplots::col2hex(colors)
+    if (length(colors) != length(text)){
+        stop("Colors and text need to have the same length")
+    }
+    return (list(legend = data.frame(color = colors,
+                                     text = text),
+                 title = title))
+}
+
 #' d3Legend
 #'
 #' <Add Description>
@@ -5,32 +17,34 @@
 #' @import htmlwidgets
 #'
 #' @export
-d3Legend <- function(colors, text, title = NULL, fontsize = 12, square = 15, 
-                     margins = NULL, width = NULL, height = NULL, 
-                     elementId = NULL, collection = FALSE) {
+d3Legend <- function(colors = NULL, text = NULL, title = NULL, leg_collect = NULL, 
+                     fontsize = 12, square = 15, margins = NULL, width = NULL, 
+                     height = NULL, elementId = NULL, collection = FALSE) {
 
+    #there are two modes to this function - either a single legend or a collection
     if (is.null(margins)){
         margins <- list(top = 20,
                         left = 20)
     }
-    
-    #Fix the coloring
-    colors <- gplots::col2hex(colors)
 
-    if (length(colors) != length(text)){
-        stop("Colors and text need to have the same length")
+    #making a list of legends - even if there is only one
+    legends <- list()
+    if (!is.null(leg_collect)){
+        for (i in 1:length(leg_collect)){
+            legends[[i]] <- formalize_legend(leg_collect[[i]]$colors, 
+                                             leg_collect[[i]]$text, 
+                                             leg_collect[[i]]$title)
+        }
+    } else {
+        legends[[1]] <- formalize_legend(colors, text, title)
     }
-
-    legend <- data.frame(color = colors,
-                         text = text)
     
     # forward options using x
     x = list(
         type = "d3Legend",
-        legend = legend,
+        legends = legends,
         fontsize = fontsize,
         square = square,
-        title = title,
         margins = margins
     )
 

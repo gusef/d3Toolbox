@@ -41,6 +41,7 @@ server <- function(input, output, session) {
         dat <- t(mtcars)
         hc01.col <- hcopt(dist(t(dat)),method="ward.D")
         dend <- as.dendrogram(hc01.col)
+        par(mar=c(5.1,4.1,4.1,8.1))
         plot(dend, horiz=T)
     })
 

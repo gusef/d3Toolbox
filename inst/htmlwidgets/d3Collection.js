@@ -64,8 +64,10 @@ HTMLWidgets.widget({
             for (var i = 0; i < collection.data.length; i++) {
                 //figure out where the subplot goes
                 var dims = getDimensions (collection, i, width, height);
-
                 var obj = collection.data[i];
+                
+                //set the callback to the heatmap callback
+                obj.callback = collection.callback;
 
                 //add a new group for each subplot
                 //and save it to the collection object so we can access it later
@@ -84,7 +86,7 @@ HTMLWidgets.widget({
                          .style('opacity', 0)
                          .attr('width', dims.pwid)
                          .attr('height', dims.phei)
-                         .on("click", function(){that.update(that, i, '', [])});
+                         .on("click", function(){that.update(that, i, '', [], true)});
 
                 // call the appropriate plot
                 var func = 'draw_' + obj.type;
@@ -94,7 +96,7 @@ HTMLWidgets.widget({
         },
 
         //function called when rows or columns from specific subplots are selected
-        update : function(obj, id, axis, index){
+        update : function(obj, id, axis, index, clear_old){
             var con = obj.collection.connectors;
 
             //only if row/column connectors were specified
@@ -102,15 +104,17 @@ HTMLWidgets.widget({
 
                 //figure out which one of the connectors is active and inactive
                 var active = getConnectors(con, id, axis);
-
                 var sub, func;
-                // then deactivate all inactive ones
-                for (var m = 0; m < obj.collection.data.length; m++){
-                    sub = obj.collection.data[m];
-                    func = 'update_' + sub.type;
-                    window[func](sub.sub_g, '', []);
+                if (clear_old){
+                    // then deactivate all 
+                    for (var m = 0; m < obj.collection.data.length; m++){
+                        sub = obj.collection.data[m];
+                        func = 'update_' + sub.type;
+                        window[func](sub.sub_g, '', [], clear_old);
+                    }
                 }
-
+                
+                //only if there are connections
                 if (active.length > 0){
                     // then activate all active ones
                     for (var l = 0; l < active.length; l++){
@@ -119,20 +123,12 @@ HTMLWidgets.widget({
                             // -1 because of the R/javascript index differences
                             sub = obj.collection.data[con[idx].names[k] - 1];
                             func = 'update_' + sub.type;
+                        
                             //run update with empty indices to deactivate all elements
-                            window[func](sub.sub_g, con[idx].dims[k], index, sub);
+                            window[func](sub.sub_g, con[idx].dims[k], index, clear_old);
                         }
                     }
                 }
-            }
-
-            if (axis !== ''){
-               //return values to shiny
-                Shiny.onInputChange(obj.collection.callback,
-                               {"plot_id" : id + 1,
-                                "plot_type" : obj.collection.data[id].type,
-                                "axis" : axis,
-                                "indices" : index});
             }
         }
     };
@@ -146,7 +142,6 @@ function getDimensions (collection, idx, width, height) {
     //go through lmat to figure out dimensions, allowing multiple rows / columns
      for (var j = 0; j < collection.lwid.length; j++) {
         for (var k = 0; k < collection.lhei.length; k++) {
-
             //only the subplot we are currently working on
             if (collection.lmat[k][j] === (idx + 1)){
                 // if we have not encountered an element before
@@ -163,8 +158,8 @@ function getDimensions (collection, idx, width, height) {
                     // if we are in the same column
                     if (y === current_y){
                         phei += height * collection.lhei[k];
-                       }
-                   }
+                    }
+                }
             }
             current_y += height * collection.lhei[k];
         }

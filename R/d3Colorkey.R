@@ -13,8 +13,8 @@ d3Colorkey <- function(data,
                        elementId = NULL, collection = FALSE) {
 
     if (is.null(keysize)){
-        keysize <- list(height = 80,
-                        width = 120)
+        keysize <- list(height = 70,
+                        width = 100)
     }
 
     #Fix the coloring

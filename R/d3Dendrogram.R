@@ -7,6 +7,7 @@
 #' @export
 d3Dendrogram <- function(data, horiz = FALSE, label = TRUE, classic = TRUE,
                          lab_adj = 120, title=NULL, subtitle=NULL, axis=TRUE,
+                         lab_font_size = 12,
                          margins = NULL, callback="DendSelection",
                          width = NULL, height = NULL, elementId = NULL, collection = FALSE) {
 
@@ -36,6 +37,7 @@ d3Dendrogram <- function(data, horiz = FALSE, label = TRUE, classic = TRUE,
         lab_adj = lab_adj,
         label_text = label_text,
         classic = classic,
+        lab_font_size = lab_font_size,
         axis = axis,
         title = title,
         subtitle = subtitle,
