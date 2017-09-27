@@ -1,24 +1,24 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Legend
 function draw_d3Legend(svg, param, width, height, collection, id){
-    //make a group to hold all 
+    //make a group to hold all
     var g = svg.append("g")
     	       .attr("transform",
     	             "translate(" + param.margins.left + "," + (param.margins.top) + ")");
 
     //then add one after another
-    var top, leg, y_offset = 0; 
+    var top, leg, y_offset = 0;
     for (var i = 0; i < param.legends.length; i++){
-        
+
         leg = param.legends[[i]];
-    
+
         top = leg.title === null ? 0 : 10;
-    
+
         sub_g = g.append("g")
                  .attr("y", y_offset)
                  .attr("transform",
                        "translate( 0," + (y_offset + top) + ")");
-    
+
         if (param.title !== null){
             svg.append("text")
                .attr("text-anchor", "start")
@@ -27,9 +27,9 @@ function draw_d3Legend(svg, param, width, height, collection, id){
                .attr("font-weight", "bold")
                .text(leg.title);
         }
-    
+
         var d3data = HTMLWidgets.dataframeToD3(leg.legend);
-    
+
         sub_g.selectAll(".legend")
              .data(d3data)
              .enter().append("rect")
@@ -39,7 +39,7 @@ function draw_d3Legend(svg, param, width, height, collection, id){
              .attr("width", param.square)
              .attr("height", param.square)
              .attr("fill", function(d, i) { return d.color; });
-    
+
         sub_g.selectAll(".legtext")
              .data(d3data)
              .enter().append("text")
@@ -49,7 +49,7 @@ function draw_d3Legend(svg, param, width, height, collection, id){
              .attr("x", param.square + 10)
              .attr("y", function(d,i) { return  2+ param.square/2 + i * (param.square + 10); })
              .attr("text-anchor", "start");
-             
+
         y_offset += top + 2 * param.square + leg.legend.color.length * (param.square + 10);
     }
 }
@@ -229,10 +229,12 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
            .text(param.subtitle);
     }
 
+    //tooltip
 	var tool_tip = d3.tip()
                      .attr('class', 'd3-tip')
 	                 .offset([-10, 0]);
 
+    //transform the data from a R dataframe to a D3 data object
     d3data = HTMLWidgets.dataframeToD3(data);
 
     if (param.singleVar){
@@ -258,7 +260,7 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
          .on('mouseout',  (param.tooltip) ? tool_tip.hide : null)
          .on("click", function(d, i) {
                 //if this was called by a collection
-                if (collection !== 'undefined'){
+                if (typeof(collection) !== 'undefined'){
                     ret = collection.update(collection,id, 'value', i, true);
                 }
                 //if we run this within shiny
@@ -267,57 +269,174 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
                 }
             });
 
-   } else {
+        //If a standard error was specified we draw it
+        if (param.SE){
+            // Add center line
+            g.selectAll("line.center")
+             .data(d3data)
+             .enter().append("line")
+             .attr("class", "box")
+             .attr("x1", function(d, i) { return x(d.name) + x.bandwidth()/2; } )
+             .attr("y1", function(d) { return y(d.x + d.SE); })
+             .attr("x2", function(d, i) { return x(d.name) + x.bandwidth()/2; } )
+             .attr("y2", function(d) { return y(d.x); });
+
+            // Add top whisker
+            g.selectAll("line.whisker")
+             .data(d3data)
+             .enter().append("line")
+             .attr("class", "topwhisker")
+             .attr("x1", function(d, i) { return x(d.name) + 2 * x.bandwidth() / 7; } )
+             .attr("y1", function(d) { return y(d.x + d.SE); })
+             .attr("x2", function(d, i) { return x(d.name) + 5 * x.bandwidth() / 7; } )
+             .attr("y2", function(d) { return y(d.x + d.SE); });
+        }
+
+    // grouped and stacked barplots
+    } else {
         tool_tip.html(function(d) {
            return "<strong>y:</strong> <span style='color:yellow'>" + d.data.tooltip + "</span>"; });
         svg.call(tool_tip);
 
         var keys = Object.keys(d3.values(d3data)[0]);
+
+        //filter toolstips and names
         keys = keys.filter( function(item) {
             return (item !== 'name') && (item !== 'tooltip'); });
+
+        //filter standard deviations
+        keys = keys.filter(function(d) {
+            return d.indexOf('SE_') == - 1; });
 
         //add color scale
         var cols = d3.scaleOrdinal()
                      .range(param.fill)
                      .domain(keys);
 
-        g.append("g")
-         .selectAll("g")
-         .data(d3.stack().keys(keys)(d3data))
-         .enter().append("g")
-         .attr("fill", function(d) { return cols(d.key); })
-         .selectAll("rect")
-         .data(function(d) { return d; })
-         .enter().append("rect")
-         .attr("class", "stackbar")
-         .attr("x", function(d) { return x(d.data.name); })
-         .attr("y", function(d) { return y(d[1]); })
-         .attr("height", function(d) { return y(d[0]) - y(d[1]); })
-         .attr("width", x.bandwidth())
-         .on('mouseover', (param.tooltip) ? tool_tip.show : null)
-         .on('mouseout',  (param.tooltip) ? tool_tip.hide : null)
-         .on("click", function(d, i) {
-               var current = null;
-               var counter = 0;
-               Object.keys(d.data).forEach(function(key,index) {
-                    counter += d.data[key];
-                    if(counter === d[1]) {
-                        current = key;
+        //stacked barplots
+        if (!param.beside){
+            g.append("g")
+             .selectAll("g")
+             .data(d3.stack().keys(keys)(d3data))
+             .enter().append("g")
+             .attr("fill", function(d) { return cols(d.key); })
+             .selectAll("rect")
+             .data(function(d) { return d; })
+             .enter().append("rect")
+             .attr("class", "stackbar")
+             .attr("x", function(d) { return x(d.data.name); })
+             .attr("y", function(d) { return y(d[1]); })
+             .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+             .attr("width", x.bandwidth())
+             .on('mouseover', (param.tooltip) ? tool_tip.show : null)
+             .on('mouseout',  (param.tooltip) ? tool_tip.hide : null)
+             .on("click", function(d, i) {
+                   var current = null;
+                   var counter = 0;
+                   Object.keys(d.data).forEach(function(key,index) {
+                        counter += d.data[key];
+                        if(counter === d[1]) {
+                            current = key;
+                        }
+                    });
+
+                    //if this was called by a collection
+                    if (typeof(collection) !== 'undefined'){
+                        collection.update(collection, id, 'value', i, true);
+                    }
+
+                    //if we run this through Shiny
+                    if (window.Shiny){
+                        Shiny.onInputChange(param.callback,
+                                           {'x_value' : d.data.name,
+                                            'y_value' : current});
                     }
                 });
 
-                //if this was called by a collection
-                if (collection !== 'undefined'){
-                    collection.update(collection, id, 'value', i, true);
-                }
-                
-                //if we run this through Shiny
-                if (window.Shiny){
-                    Shiny.onInputChange(param.callback,
-                                       {'x_value' : d.data.name,
-                                        'y_value' : current});
-                }
-            });
+        //grouped barplot
+        } else {
+            // scale for within a single band
+            var x1 = d3.scaleBand()
+                       .padding(0.05)
+                       .domain(keys)
+                       .rangeRound([0, x.bandwidth()]);
+
+            //remap the data so they are easier accessible
+            var dat = d3data.map(
+                function(d){
+                    var maps = {};
+                    for (i = 0; i < keys.length; i++){
+                        maps[keys[i]] = {'mean' : d[keys[i]],
+                                         'se'    : d['SE_'+keys[i]]};
+                    }
+                    return {"values" : maps,
+                            "name" : d.name
+                    }; });
+
+    	    g.append("g")
+             .selectAll("g")
+             .data(dat)
+             .enter().append("g")
+                .attr("transform", function(d) { return "translate(" + x(d.name) + ",0)"; })
+             .selectAll("rect")
+                .data(function(d){return d3.entries(d.values)})
+                 .enter().append("rect")
+                 .attr("class", "bar")
+                 .attr("x", function(d) { return x1(d.key); })
+                 .attr("y", function(d) { return y(d.value.mean); })
+                 .attr("width", x1.bandwidth())
+                 .attr("height", function(d) { return hei - y(d.value.mean); })
+                 .attr("fill", function(d) { return cols(d.key); })
+                 .on("click", function(d, i) {
+                        //if this was called by a collection
+                        if (typeof(collection) !== 'undefined'){
+                            collection.update(collection, id, 'value', i, true);
+                        }
+
+                        //if we run this through Shiny
+                        if (window.Shiny){
+                            Shiny.onInputChange(param.callback,
+                                               {'x_value' : d.key,
+                                                'y_value' : d.value.mean});
+                        }
+                    });
+
+            //If a standard error was specified we draw it
+            if (param.SE){
+
+                // Add center line
+                g.append("g")
+                 .selectAll("g")
+                 .data(dat)
+                 .enter().append("g")
+                    .attr("transform", function(d) { return "translate(" + x(d.name) + ",0)"; })
+                 .selectAll("line.center")
+                    .data(function(d){return d3.entries(d.values)})
+                    .enter().append("line")
+                    .attr("class", "box")
+                    .attr("x1", function(d, i) { return x1(d.key) + x1.bandwidth()/2; } )
+                    .attr("y1", function(d) { return y(d.value.mean + d.value.se); })
+                    .attr("x2", function(d, i) { return x1(d.key) + x1.bandwidth()/2; } )
+                    .attr("y2", function(d) { return y(d.value.mean); });
+
+
+                // Add top whisker
+                g.append("g")
+                 .selectAll("g")
+                 .data(dat)
+                 .enter().append("g")
+                    .attr("transform", function(d) { return "translate(" + x(d.name) + ",0)"; })
+                 .selectAll("line.whisker")
+                    .data(function(d){return d3.entries(d.values)})
+                    .enter().append("line")
+                    .attr("class", "box")
+                    .attr("x1", function(d, i) { return x1(d.key) + 2 * x1.bandwidth() / 7; } )
+                    .attr("y1", function(d) { return y(d.value.mean + d.value.se); })
+                    .attr("x2", function(d, i) { return x1(d.key) + 5 * x1.bandwidth() / 7; } )
+                    .attr("y2", function(d) { return y(d.value.mean + d.value.se); });
+
+            }
+        }
     }
 }
 
@@ -929,9 +1048,9 @@ function draw_d3Dendrogram(svg, param, width, height, collection, id) {
 
         //check if the font size is too big
         var font_size = param.horiz ? hei : wid;
-        font_size = font_size / param.label_text.length; 
-        font_size = param.lab_font_size < font_size ? param.lab_font_size : font_size;        
-        
+        font_size = font_size / param.label_text.length;
+        font_size = param.lab_font_size < font_size ? param.lab_font_size : font_size;
+
         if (param.horiz) {
             node.append("text")
                 .each(function(d) { d.label = this; })
@@ -1044,7 +1163,7 @@ function draw_d3Image(svg, param, width, height, collection, id) {
         svg.append("text")
            .attr("text-anchor", "middle")
            .attr("transform", "translate("+ (width/2) +","+(height-10)+")")
-           .text(param.xlab_text);        
+           .text(param.xlab_text);
     }
 
     var ylab = d3.scaleBand()
@@ -1073,7 +1192,7 @@ function draw_d3Image(svg, param, width, height, collection, id) {
         svg.append("text")
            .attr("text-anchor", "middle")
            .attr("transform", "translate(" + (width-10) + "," + (height/2)+")rotate(-90)")
-           .text(param.ylab_text);        
+           .text(param.ylab_text);
     }
 
     // highlighting with mouseover
@@ -1090,7 +1209,7 @@ function draw_d3Image(svg, param, width, height, collection, id) {
             if (collection !== 'undefined'){
                 collection.update(collection,id, click_type, [i], true);
             //if the image was called directly
-            } 
+            }
             //if we run this through Shiny
             if (window.Shiny){
                 Shiny.onInputChange(param.callback,
@@ -1157,7 +1276,7 @@ function draw_d3Image(svg, param, width, height, collection, id) {
         cell.on('mouseover', tool_tip.show)
             .on('mouseout',  tool_tip.hide);
     }
-    
+
     //add a brush that can select all cells in an image
     //deactivated for now since it over-writes the tooltips
  /*   svg.append("g")
@@ -1165,12 +1284,12 @@ function draw_d3Image(svg, param, width, height, collection, id) {
     .call(d3.brush()
         .extent([[0, 0], [wid, hei]])
         .on("end", brushended));
-   */     
+   */
     function brushended() {
         if (!d3.event.sourceEvent) return; // Only transition after input.
         if (!d3.event.selection) return; // Ignore empty selections.
-   
-        //get the index    
+
+        //get the index
         var start = d3.event.selection[0];
         var end = d3.event.selection[1];
         var x_coords = [start[0],end[0]];
@@ -1187,25 +1306,25 @@ function draw_d3Image(svg, param, width, height, collection, id) {
         //get the snapped coordinates
         start = [x_coords[0] * x.bandwidth(),
                  y_coords[0] * y.bandwidth()];
-                 
+
         end = [x_coords[1] * x.bandwidth(),
                y_coords[1] * y.bandwidth()];
-               
+
         //reverse the y coordinates
         y_coords = y_coords.map(function(d){ return data.length - d;});
 
         //transform into ranges
-        x_coords = d3.range(x_coords[0],x_coords[1]);  
-        y_coords = d3.range(y_coords[1],y_coords[0]);  
+        x_coords = d3.range(x_coords[0],x_coords[1]);
+        y_coords = d3.range(y_coords[1],y_coords[0]);
 
         //if this was called by a collection
         if (collection !== 'undefined'){
             d3.select(this).transition().call(d3.event.target.move, [start,start]);
             collection.update(collection,id, 'column', x_coords, true);
             collection.update(collection,id, 'row', y_coords, false);
-            
+
         }
-        
+
         //if we run this through shiny
         if (window.Shiny){
             //snap into the selected cells
@@ -1220,18 +1339,18 @@ function draw_d3Image(svg, param, width, height, collection, id) {
 }
 
 function update_d3Image(svg, dim, index, clear_old) {
-    
+
     // highlight the labels
     var sel = dim === 'row' ? '.ylab' : '.selectlabel';
     sel = dim === 'column' ? '.xlab' : sel;
     var labs = svg.selectAll(sel);
     labs.each(function(d, i){
-        
+
         // if clear_is true overwrite the active labels, if not use the old activation
         if (!clear_old){
             console.log(index);
         }
-       
+
         //var active =  clear_old ? false : d3.select(this).classed("label--selected");
         var active = false;
 
@@ -1240,14 +1359,14 @@ function update_d3Image(svg, dim, index, clear_old) {
                 active = true;
             }
         }
-        
-        
+
+
         d3.select(this).classed("label--selected", active);} );
 
     //inactivate all cells that are not selected
     var y=svg.selectAll('.cell')
     y.each(function(d, i){
-            
+
         // if clear_is true overwrite the active labels, if not use the old activation
         var inactivate = clear_old ? true : d3.select(this).classed("cell--inactive");
 
@@ -1266,7 +1385,7 @@ function update_d3Image(svg, dim, index, clear_old) {
              if (index.length === 0){
                 inactivate = false;
             }
-            
+
             for (var j = 0; j < index.length && inactivate; j++){
                 if (index[j] === +idx){
                     inactivate = false;

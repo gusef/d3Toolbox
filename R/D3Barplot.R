@@ -5,7 +5,9 @@
 #' @import htmlwidgets
 #'
 #' @export
-d3Barplot <- function(data, col='black', tooltip=NULL, unit='', xlab='', ylab='', padding=0.1,
+d3Barplot <- function(data, se = NULL,
+                      col='black', beside=FALSE, tooltip=NULL,
+                      unit='', xlab='', ylab='', padding=0.1,
                       show_axes = TRUE, title=NULL, subtitle=NULL,
                       callback='BarSelection', yrange=NULL,
                       margins = NULL, width = NULL, height = NULL,
@@ -33,22 +35,44 @@ d3Barplot <- function(data, col='black', tooltip=NULL, unit='', xlab='', ylab=''
         if(length(col)==1){
             col <- rep(col,nrow(data))
         }
-    #stacked barplot
+        #if there is a standard error specified
+        if (!is.null(se)){
+            if (length(se) != nrow(data)){
+                stop('If standard error is specified there nees to be a SE value for each bar')
+            }
+            data$SE <- se
+        }
+    #grouped / stacked barplot
     }else{
         singleVar = FALSE
         if(length(col)!=ncol(data)){
             stop('Need to specify one color for each variable')
         }
+        #if there is a standard error specified
+        if (!is.null(se)){
+            if (all(dim(se) != dim(data))){
+                stop('If standard error is specified there nees to be a SE value for each bar')
+            }
+            if (!is.null(colnames(se)) && colnames(se) != colnames(data)){
+                stop('If column names on SE are specified, they need to match the data names')
+            }
+            colnames(se) <- paste0('SE_',colnames(data))
+            data <- cbind(data,se)
+        }
     }
-    
+
     #get max value
-    max_value = max(rowSums(data))
-    
+    if (beside){
+        max_value <- max(data)
+    } else {
+        max_value <- max(rowSums(data))
+    }
+
     #separate names and data
     data$name <- rownames(data)
     rownames(data) <- NULL
 
-    
+
     if (!is.null(tooltip)){
         data$tooltip <- tooltip;
     }
@@ -57,11 +81,13 @@ d3Barplot <- function(data, col='black', tooltip=NULL, unit='', xlab='', ylab=''
     x = list(
         type = "d3Barplot",
         data = data,
+        SE = !is.null(se),
         fill = col,
         unit = unit,
         xlab = xlab,
         ylab = ylab,
         singleVar = singleVar,
+        beside = beside,
         show_axes = show_axes,
         yrange = yrange,
         padding = padding,
