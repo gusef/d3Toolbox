@@ -1,3 +1,31 @@
+//generic legend function that can be called from different plots
+function draw_legend(g , legend, wid, hei){
+    // reshape the legend data so D3 can play around with it
+    var d3legend = HTMLWidgets.dataframeToD3(legend);
+
+    // add a legend object for each item
+    var leg = g.selectAll(".legend")
+                  .data(d3legend)
+                  .enter().append("g")
+                  .attr("class", "legend")
+                  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+    // add a rectangle on each element
+    leg.append("rect")
+       .attr("x", wid - 18)
+       .attr("width", 18)
+       .attr("height", 18)
+       .style("fill", function(d) { return d.col; });
+
+    // add the text to each element
+    leg.append("text")
+       .attr("x", wid - 24)
+       .attr("y", 9)
+       .attr("dy", ".35em")
+       .style("text-anchor", "end")
+       .text(function(d) { return d.name; });
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Legend
 function draw_d3Legend(svg, param, width, height, collection, id){
@@ -438,6 +466,13 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
             }
         }
     }
+
+    //finally add a legend if it was specified
+    if (param.legend !== null){
+        draw_legend(g , param.legend, wid, hei)
+    }
+
+
 }
 
 function update_d3Barplot(obj, dim, index, clear_old) {
@@ -803,30 +838,7 @@ function draw_d3Scatter(svg, param, width, height, collection, id) {
     svg.call(lasso);
 
     if (param.legend !== null){
-        // reshape the legend data so D3 can play around with it
-        var d3legend = HTMLWidgets.dataframeToD3(param.legend);
-
-        // add a legend object for each item
-        var legend = g.selectAll(".legend")
-                      .data(d3legend)
-                      .enter().append("g")
-                      .attr("class", "legend")
-                      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-        // add a rectangle on each element
-        legend.append("rect")
-              .attr("x", wid - 18)
-              .attr("width", 18)
-              .attr("height", 18)
-              .style("fill", function(d) { return d.col; });
-
-        // add the text to each element
-        legend.append("text")
-              .attr("x", wid - 24)
-              .attr("y", 9)
-              .attr("dy", ".35em")
-              .style("text-anchor", "end")
-              .text(function(d) { return d.name; });
+        draw_legend(g , param.legend, wid, hei)
     }
 }
 

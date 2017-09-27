@@ -16,9 +16,8 @@ ui <- fillPage(fillRow(
 
 server <- function(input, output, session) {
 
-
     output$SE_panel <- renderd3Barplot({
-        data <- data.frame(x=(1:15),
+        data <- data.frame(x=(1:15)/4*3,
                            y=(1:15)/2,
                            z=15:1)
         rownames(data) <- c(LETTERS[1:15])
@@ -26,6 +25,9 @@ server <- function(input, output, session) {
         se <- data.frame(x=(1:15)/20,
                           y=(1:15)/15,
                           z=(15:1)/15)
+
+        legend <- data.frame(col=c('steelblue','grey','#de2d26'),
+                             name=c('blue','grey','red'))
 
         d3Barplot(data,
                   se=se,
@@ -35,6 +37,7 @@ server <- function(input, output, session) {
                   xlab='Letters',
                   ylab='Frequencies',
                   title='New Barplot',
+                  legend=legend,
                   subtitle='with subtitle',
                   callback='BarSelection')
     })
