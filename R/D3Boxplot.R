@@ -7,7 +7,7 @@
 #' @export
 d3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
                       dotsize =2, xlab='', ylab='', title=NULL, subtitle=NULL, margins = NULL,
-                      callback_handler='BoxplotSelection', legend=NULL,
+                      callback='BoxplotSelection', legend=NULL,
                       width = NULL, height = NULL, elementId = NULL, collection = FALSE) {
 
     if (is.null(margins)){
@@ -83,9 +83,9 @@ d3Boxplot <- function(data, col='lightgrey', showdots =TRUE, dotcol='darkgrey',
         ylab = ylab,
         title = title,
         subtitle = subtitle,
-        legend=legend,
-        margins=margins,
-        callback_handler = callback_handler
+        legend = legend,
+        margins = margins,
+        callback = callback
     )
 
     if (collection){

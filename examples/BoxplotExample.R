@@ -10,8 +10,8 @@ ui <- fillPage(fillRow(
     h3(verbatimTextOutput("currentOutput")),
     d3BarplotOutput("filterpanel", width = "100%", height = "100%"),
     d3ScatterOutput("lowdimpanel", width = "100%", height = "100%")
-  ),flex = c(2,1))#,
-   #tags$head(tags$script(src="D3Boxplot.js"))
+  ),flex = c(2,1))
+  #,tags$head(tags$script(src="D3Boxplot.js"))
 )
 
 server <- function(input, output, session) {
