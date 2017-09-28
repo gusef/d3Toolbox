@@ -6,9 +6,9 @@
 #'
 #' @export
 d3Barplot <- function(data, se = NULL,
-                      col='black', beside=FALSE, tooltip=NULL,
+                      col='black', beside=FALSE, tooltip=NULL, las = 1,
                       unit='', xlab='', ylab='', padding=0.1, legend=NULL,
-                      show_axes = TRUE, title=NULL, subtitle=NULL,
+                      show_axes = TRUE, title=NULL, title_size=24, subtitle=NULL,
                       callback='BarSelection', yrange=NULL,
                       margins = NULL, width = NULL, height = NULL,
                       elementId = NULL, collection = FALSE) {
@@ -45,6 +45,7 @@ d3Barplot <- function(data, se = NULL,
     #grouped / stacked barplot
     }else{
         singleVar = FALSE
+        data <- data.frame(data,stringsAsFactors = F)
         if(length(col)!=ncol(data)){
             stop('Need to specify one color for each variable')
         }
@@ -86,12 +87,14 @@ d3Barplot <- function(data, se = NULL,
         unit = unit,
         xlab = xlab,
         ylab = ylab,
+        las = las,
         singleVar = singleVar,
         beside = beside,
         show_axes = show_axes,
         yrange = yrange,
         padding = padding,
         title = title,
+        title_size = paste0(title_size,'px'),
         legend = legend,
         max_value = max_value,
         subtitle = subtitle,

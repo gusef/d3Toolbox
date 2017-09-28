@@ -219,11 +219,19 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
 
     // add the x and y axes
     if (param.show_axes){
-     	g.append("g")
-	     .attr("class", "axis axis--x")
-		 .attr("transform", "translate(0," + hei + ")")
-    	 .call(d3.axisBottom(x));
-
+     	var xax = g.append("g")
+    	     .attr("class", "axis axis--x")
+    		 .attr("transform", "translate(0," + hei + ")")
+        	 .call(d3.axisBottom(x));
+        
+        if (param.las !== 1){
+            xax.selectAll("text")	
+               .style("text-anchor", "end")
+               .attr("dx", "-.8em")
+               .attr("dy", ".15em")
+               .attr("transform", "rotate(-55)");
+        }
+    
     	g.append("g")
     	 .attr("class", "axis axis--y")
     	 .call(d3.axisLeft(y).ticks(10, param.unit));
@@ -245,7 +253,7 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
         svg.append("text")
            .attr("text-anchor", "middle")
            .attr("transform", "translate("+ (width/2) +","+((margin.top+top)/3)+")")
-           .attr("font-size", "24px")
+           .attr("font-size", param.title_size)
            .text(param.title);
     }
 
