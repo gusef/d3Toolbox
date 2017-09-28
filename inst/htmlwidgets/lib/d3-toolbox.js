@@ -223,15 +223,15 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
     	     .attr("class", "axis axis--x")
     		 .attr("transform", "translate(0," + hei + ")")
         	 .call(d3.axisBottom(x));
-        
+
         if (param.las !== 1){
-            xax.selectAll("text")	
+            xax.selectAll("text")
                .style("text-anchor", "end")
                .attr("dx", "-.8em")
                .attr("dy", ".15em")
                .attr("transform", "rotate(-55)");
         }
-    
+
     	g.append("g")
     	 .attr("class", "axis axis--y")
     	 .call(d3.axisLeft(y).ticks(10, param.unit));
@@ -403,7 +403,9 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
                     var maps = {};
                     for (i = 0; i < keys.length; i++){
                         maps[keys[i]] = {'mean' : d[keys[i]],
-                                         'se'    : d['SE_'+keys[i]]};
+                                         'se'    : d['SE_'+keys[i]],
+                                          'name' : d.name
+                        };
                     }
                     return {"values" : maps,
                             "name" : d.name
@@ -431,9 +433,10 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
 
                         //if we run this through Shiny
                         if (window.Shiny){
+                            console.log(d)
                             Shiny.onInputChange(param.callback,
-                                               {'x_value' : d.key,
-                                                'y_value' : d.value.mean});
+                                               {'x_value' : d.value.name,
+                                                'group' : d.key});
                         }
                     });
 
