@@ -303,6 +303,10 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
                 if (window.Shiny) {
                    Shiny.onInputChange(param.callback, d.name);
                 }
+
+                //uncolor all
+                d3.selectAll('rect').classed("bar--selected", false) ;
+                d3.select(this).classed("bar--selected", true);
             });
 
         //If a standard error was specified we draw it
@@ -387,6 +391,10 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
                                            {'x_value' : d.data.name,
                                             'y_value' : current});
                     }
+
+                    //uncolor all
+                    d3.selectAll('rect').classed("bar--selected", false) ;
+                    d3.select(this).classed("bar--selected", true);
                 });
 
         //grouped barplot
@@ -433,11 +441,15 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
 
                         //if we run this through Shiny
                         if (window.Shiny){
-                            console.log(d)
                             Shiny.onInputChange(param.callback,
                                                {'x_value' : d.value.name,
                                                 'group' : d.key});
                         }
+
+                        //uncolor all
+                        d3.selectAll('rect').classed("bar--selected", false) ;
+                        d3.select(this).classed("bar--selected", true);
+
                     });
 
             //If a standard error was specified we draw it
@@ -1368,11 +1380,6 @@ function update_d3Image(svg, dim, index, clear_old) {
     sel = dim === 'column' ? '.xlab' : sel;
     var labs = svg.selectAll(sel);
     labs.each(function(d, i){
-
-        // if clear_is true overwrite the active labels, if not use the old activation
-        if (!clear_old){
-            console.log(index);
-        }
 
         //var active =  clear_old ? false : d3.select(this).classed("label--selected");
         var active = false;

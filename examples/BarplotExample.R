@@ -28,7 +28,6 @@ server <- function(input, output, session) {
 
         legend <- data.frame(col=c('steelblue','grey','#de2d26'),
                              name=c('blue','grey','red'))
-
         d3Barplot(data,
                   se=se,
                   beside=T,
@@ -42,20 +41,19 @@ server <- function(input, output, session) {
                   callback='BarSelection')
     })
 
-
-  #multidim panel
-  output$tSNE_panel <- renderd3Barplot({
-      data <- data.frame(x=(1:15),
-                         y=(1:15)/2,
-                         z=15:1)
-      d3Barplot(data,
-                col=c('steelblue','grey','#de2d26'),
-                tooltip=c(paste0('letter_',LETTERS[1:15])),
-                xlab='Letters',
-                ylab='Frequencies',
-                title='New Barplot',
-                subtitle='with subtitle',
-                callback='BarSelection')
+    #multidim panel
+    output$tSNE_panel <- renderd3Barplot({
+        data <- data.frame(x=(1:15),
+                           y=(1:15)/2,
+                           z=15:1)
+        d3Barplot(data,
+                  col=c('steelblue','grey','#de2d26'),
+                  tooltip=c(paste0('letter_',LETTERS[1:15])),
+                  xlab='Letters',
+                  ylab='Frequencies',
+                  title='New Barplot',
+                  subtitle='with subtitle',
+                  callback='BarSelection')
   })
 
   output$filterpanel <- renderd3Barplot({
