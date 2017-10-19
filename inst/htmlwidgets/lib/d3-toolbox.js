@@ -1,29 +1,65 @@
 //generic legend function that can be called from different plots
-function draw_legend(g , legend, wid, hei){
+function draw_legend(g , param, wid, hei){
+    var legend = param.legend;
+
     // reshape the legend data so D3 can play around with it
     var d3legend = HTMLWidgets.dataframeToD3(legend);
 
+    //figure out where the legend should align to
+    var xpos = ((param.legend_pos[1] * wid) / 2) + 5;
+    var ypos = ((param.legend_pos[0] * hei) / 2) + 5;
+
+    // if on the far right
+    if (param.legend_pos[1] == 2){
+        xpos -= param.legend_right_offset;
+    }
+
+    //if on the bottom
+    if (param.legend_pos[0] == 2){
+        ypos -= (d3legend.length * 20) + 5;
+    }
+
+    //if there is a title and the legend is on the top shift all of it down
+    if (param.legend_title !== null && param.legend_pos[0] === 0){
+        ypos += 20;
+    }
+
+    // add a container for the legend
+    var leg = g.append("g")
+               .attr("transform",
+                    function(d, i) {
+                        return "translate(" + xpos + "," + ypos + ")"; });
+
+    //if specified add a legend title
+    if (param.legend_title !== null){
+        leg.append("text")
+           .attr("text-anchor", "begin")
+           .attr("transform", "translate(0,-10)")
+           .attr("font-weight", "bold")
+           .text(param.legend_title);
+    }
+
     // add a legend object for each item
-    var leg = g.selectAll(".legend")
+    var item = leg.selectAll(".legend")
                   .data(d3legend)
                   .enter().append("g")
                   .attr("class", "legend")
                   .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
+
     // add a rectangle on each element
-    leg.append("rect")
-       .attr("x", wid - 18)
-       .attr("width", 18)
-       .attr("height", 18)
-       .style("fill", function(d) { return d.col; });
+    item.append("rect")
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", function(d) { return d.col; });
 
     // add the text to each element
-    leg.append("text")
-       .attr("x", wid - 24)
-       .attr("y", 9)
-       .attr("dy", ".35em")
-       .style("text-anchor", "end")
-       .text(function(d) { return d.name; });
+    item.append("text")
+        .attr("x", 24)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "begin")
+        .text(function(d) { return d.name; });
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -492,7 +528,7 @@ function draw_d3Barplot(svg, param, width, height, collection, id) {
 
     //finally add a legend if it was specified
     if (param.legend !== null){
-        draw_legend(g , param.legend, wid, hei)
+        draw_legend(g , param, wid, hei)
     }
 
 
@@ -861,7 +897,7 @@ function draw_d3Scatter(svg, param, width, height, collection, id) {
     svg.call(lasso);
 
     if (param.legend !== null){
-        draw_legend(g , param.legend, wid, hei)
+        draw_legend(g , param, wid, hei)
     }
 }
 

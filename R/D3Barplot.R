@@ -8,6 +8,7 @@
 d3Barplot <- function(data, se = NULL,
                       col='black', beside=FALSE, tooltip=NULL, las = 1,
                       unit='', xlab='', ylab='', padding=0.1, legend=NULL,
+                      legend_title=NULL,legend_pos='topright',legend_right_offset = 100,
                       show_axes = TRUE, title=NULL, title_size=24, subtitle=NULL,
                       callback='BarSelection', yrange=NULL,
                       margins = NULL, width = NULL, height = NULL,
@@ -78,6 +79,29 @@ d3Barplot <- function(data, se = NULL,
         data$tooltip <- tooltip;
     }
 
+    #figure out legend positioning
+    if (!is.null(legend)){
+        if (legend_pos == 'topleft'){
+            legend_pos <- c(0,0)
+        }else if (legend_pos == 'top'){
+            legend_pos <- c(0,1)
+        }else if (legend_pos == 'topright'){
+            legend_pos <- c(0,2)
+        }else if (legend_pos == 'right'){
+            legend_pos <- c(1,2)
+        }else if (legend_pos == 'bottomright'){
+            legend_pos <- c(2,2)
+        }else if (legend_pos == 'bottom'){
+            legend_pos <- c(2,1)
+        }else if (legend_pos == 'bottomleft'){
+            legend_pos <- c(2,0)
+        }else if (legend_pos == 'left'){
+            legend_pos <- c(1,0)
+        }else{
+            stop('legend_pos needs to be "top","right","left","bottom","bottomright",..')
+        }
+    }
+
     # forward options using x
     x = list(
         type = "d3Barplot",
@@ -96,6 +120,9 @@ d3Barplot <- function(data, se = NULL,
         title = title,
         title_size = paste0(title_size,'px'),
         legend = legend,
+        legend_title=legend_title,
+        legend_pos=legend_pos,
+        legend_right_offset=legend_right_offset,
         max_value = max_value,
         subtitle = subtitle,
         margins=margins,

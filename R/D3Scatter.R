@@ -7,7 +7,8 @@
 #' @export
 d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
                       title=NULL, subtitle=NULL, callback='ScatterSelection',
-                      tooltip=NULL, legend=NULL ,width = NULL, height = NULL,
+                      tooltip=NULL, legend=NULL,legend_title=NULL,legend_pos='topright',
+                      legend_right_offset = 100, width = NULL, height = NULL,
                       xrange=NULL, yrange=NULL, margins = NULL,
                       col_scale = RColorBrewer::brewer.pal(11,"RdBu")[11:1],
                       elementId = NULL, collection = FALSE) {
@@ -61,6 +62,29 @@ d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
     }
     names(data)[1:2] <- c('x','y')
 
+    #figure out legend positioning
+    if (!is.null(legend)){
+        if (legend_pos == 'topleft'){
+            legend_pos <- c(0,0)
+        }else if (legend_pos == 'top'){
+            legend_pos <- c(0,1)
+        }else if (legend_pos == 'topright'){
+            legend_pos <- c(0,2)
+        }else if (legend_pos == 'right'){
+            legend_pos <- c(1,2)
+        }else if (legend_pos == 'bottomright'){
+            legend_pos <- c(2,2)
+        }else if (legend_pos == 'bottom'){
+            legend_pos <- c(2,1)
+        }else if (legend_pos == 'bottomleft'){
+            legend_pos <- c(2,0)
+        }else if (legend_pos == 'left'){
+            legend_pos <- c(1,0)
+        }else{
+            stop('legend_pos needs to be "top","right","left","bottom","bottomright",..')
+        }
+    }
+
     # forward options using x
     x = list(
         type = "d3Scatter",
@@ -74,6 +98,9 @@ d3Scatter <- function(data, col='black', dotsize =3.5, xlab='', ylab='',
         subtitle = subtitle,
         tooltip=tooltip,
         legend=legend,
+        legend_title=legend_title,
+        legend_pos=legend_pos,
+        legend_right_offset=legend_right_offset,
         margins=margins,
         callback = callback
     )

@@ -37,6 +37,8 @@ server <- function(input, output, session) {
                   ylab='Frequencies',
                   title='New Barplot',
                   legend=legend,
+                  legend_title = 'My legend',
+                  legend_pos = 'topright',
                   subtitle='with subtitle',
                   callback='BarSelection')
     })
@@ -46,6 +48,7 @@ server <- function(input, output, session) {
         data <- data.frame(x=(1:15),
                            y=(1:15)/2,
                            z=15:1)
+
         d3Barplot(data,
                   col=c('steelblue','grey','#de2d26'),
                   tooltip=c(paste0('letter_',LETTERS[1:15])),
