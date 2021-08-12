@@ -1,3 +1,10 @@
+#' Heatmap based on D3
+#'
+#'
+#'
+#' @import htmlwidgets
+#'
+#' @export
 heatmap.d3 <- function(x,
                        Rowv = TRUE,
                        Colv = if (symm) "Rowv" else TRUE,
